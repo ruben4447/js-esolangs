@@ -1,8 +1,8 @@
 import BrainfuckInterpreter from "./esolangs/Brainfuck/Interpreter.js";
-import { textToBrainfuck } from "./esolangs/Brainfuck/utils.js";
 import ElementInterpreter from "./esolangs/Element/Interpreter.js";
 import LengthInterpreter from "./esolangs/Length/Interpreter.js";
-import { textToLength } from "./esolangs/Length/utils.js";
+import BefungeInterpreter from "./esolangs/Befunge/Interpreter.js";
+import { num } from "./utils.js";
 
 var interpreter; // Code interpreter
 var activeBlocker; // Blocker object. May be resolve by cmd:'unblock'
@@ -71,13 +71,30 @@ function createInterpreter(lang, opts) {
             activeBlocker = inputBlocker;
             self.postMessage({ cmd: 'reqGetch' });
         };
+    } else if (lang === 'befunge') {
+        i = new BefungeInterpreter();
+        i.debug = opts.debug === true;
+        i.wrapLimit = num(opts.wrapLimit);
+        i.selfModification = opts.selfModification === true;
+        if (opts.updateVisuals) {
+            i._callbackUpdateStack = (type, value) => self.postMessage({ cmd: 'updateStack', type, value });
+            i._callbackUpdatePtr = (key, value) => self.postMessage({ cmd: 'updateObject', name: 'pointers', action: 'set', key, value });
+        }
+        i._callbackInput = (mode, inputBlocker) => {
+            activeBlocker = inputBlocker;
+            if (mode === 'getch') {
+                pushStatus('Requesting GETCH');
+                self.postMessage({ cmd: 'reqGetch' });
+            } else {
+                pushStatus('Requesting Input');
+                self.postMessage({ cmd: 'reqInput' });
+            }
+        };
     } else {
         throw new TypeError(`Unknown language '${lang}'`);
     }
     // Add callback handler for output (as it is so common)
-    if (i._callbackOutput) {
-        i._callbackOutput = msg => self.postMessage({ cmd: 'print', msg });
-    }
+    if (i._callbackOutput) i._callbackOutput = msg => self.postMessage({ cmd: 'print', msg });
     postMessage("Created interpreter for " + lang);
 
     // Load code if there is any in the cache

@@ -116,4 +116,4 @@ Pops value from `main` stack. Remove last character then push it to `main` stack
 View top item of stack (do not pop). Run code inside `[]` that many times.
 
 ### While Loop: `{...}`
-Every time `{` is encountered, view top item of stack. If item `> 0`, run code inside `{}` and jump back to `}`.
+Every time `{` is encountered, view top item of stack. If item `> 0`, run code inside `{}` and jump back to `{`. Else, jump to `}`

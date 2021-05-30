@@ -4,6 +4,7 @@ import { HTMLObject } from './classes/HTMLObject.js';
 
 export const regexLetter = /[A-Za-z]/;
 export const regexNumber = /[0-9]/;
+export const regexWhitespace = /\s/;
 
 export function createFieldset(parent, legend) {
     const fieldset = document.createElement("fieldset");
@@ -176,4 +177,20 @@ export async function readFileAsText(file) {
         reader.onerror = reject;
         reader.readAsText(file);
     });
+}
+
+/** Given an array of text, make each line the same length. */
+export function padLines(lines, pad = ' ') {
+    if (pad.length !== 1) throw new Error(`Invalid pad character '${pad}'`);
+    const maxL = Math.max(...lines.map(l => l.toString().length));
+    for (let i = 0; i < lines.length; i++) {
+        lines[i] = lines[i].padEnd(maxL, pad);
+    }
+}
+
+export const randomInt = (min, max) => Math.floor(Math.random() * (max - min)) + min;
+export const randomChoice = array => array[randomInt(0, array.length)];
+
+export function strReplaceAt(string, index, replacement) {
+    return string.substr(0, index) + replacement + string.substr(index + replacement.length);
 }

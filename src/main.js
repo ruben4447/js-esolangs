@@ -94,5 +94,10 @@ function _main() {
 window.addEventListener('load', async () => {
     await _main();
 
-    selectEsolang("length", false);
+    selectEsolang("befunge", false);
+    userControl.setCode(`2>:3g" "-!v\\  g30              <
+ |!\`"O":+1_:.",",:03p>03g+:"O"\`|
+ @                   ^  p3\\" ":<
+2 234567890123456789012345678901234567890123456789012345678901234567890123456789
+    `);
 });

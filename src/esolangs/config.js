@@ -84,6 +84,29 @@ export const langOptions = {
             },
         },
     },
+    befunge: {
+        wiki: 'https://esolangs.org/wiki/Befunge',
+        gui: { pointers: 'object', stack: 'stack' },
+        opts: {
+            debug: false,
+            wrapLimit: 1000, // Set to 0 to disallow wrapping
+            selfModification: true,
+        },
+        buttons: {
+            reset: {
+                text: 'Reset',
+                fn: (obj) => ({ code: obj.getCode() }),
+            },
+            interpret: {
+                text: 'Interpret',
+                fn: (obj) => ({ code: obj.getCode() }),
+            },
+            step: {
+                text: 'Step',
+                fn: () => ({}),
+            },
+        },
+    },
 };
 
 export default langOptions;
