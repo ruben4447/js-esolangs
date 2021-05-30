@@ -1,4 +1,4 @@
-import { main, elStatus, createInterpreterWorker, killInterpreterWorker, selectEsolang, interpreterWorker } from './app.js';
+import { main, elStatus, createInterpreterWorker, killInterpreterWorker, selectEsolang, interpreterWorker, editConsoleUI } from './app.js';
 import { createFieldset } from './utils.js';
 import { langOptions } from './esolangs/config.js';
 import UserControl from "./classes/UserControl.js";
@@ -70,5 +70,5 @@ function _main() {
 window.addEventListener('load', async () => {
     await _main();
 
-    selectEsolang("length", false);
+    // selectEsolang("length", false);
 });

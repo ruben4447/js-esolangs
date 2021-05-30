@@ -5,7 +5,7 @@ Wiki Link: https://esolangs.org/wiki/Length
 Utilises a single stack
 
 ## Comments
-Anything after `;` will be ignored
+Anything after `;` will be ignored (this option must be enabled)
 
 ## Commands
 Each command in Length is places on a line. The length of the line determined the command.
