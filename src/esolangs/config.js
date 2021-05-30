@@ -1,4 +1,4 @@
-import { textToCodeUI } from './../app.js';
+import { popupTextarea } from './../app.js';
 
 export const langOptions = {
     brainfuck: {
@@ -27,8 +27,8 @@ export const langOptions = {
             },
             textToCode: {
                 text: 'Text to Brainfuck',
-                fn: async obj => {
-                    let text = await textToCodeUI("Brainfuck");
+                fn: async () => {
+                    let text = await popupTextarea(`Text to Brainfuck`, `Convert text to brainfuck code`, `Convert`);
                     return { text };
                 },
             },
@@ -67,6 +67,24 @@ export const langOptions = {
                 text: 'Reset',
                 fn: (obj) => ({ code: obj.getCode() }),
             },
+            textToCode: {
+                text: 'Text to Length',
+                fn: async () => {
+                    let text = await popupTextarea(`Text to Length`, `Convert text to length code`, `Convert`);
+                    return { text };
+                },
+            },
+            toShorthand: {
+                text: 'To Shorthand',
+                fn: obj => ({ code: obj.getCode() }),
+            },
+            fromShorthand: {
+                text: 'From Shorthand',
+                fn: async () => {
+                    let code = await popupTextarea(`Length: From Shorthand`, `Convert shorthand length code to normal length code`, `Convert`);
+                    return { code };
+                },
+            },
             interpret: {
                 text: 'Interpret',
                 fn: (obj) => ({ code: obj.getCode() }),
@@ -74,13 +92,6 @@ export const langOptions = {
             step: {
                 text: 'Step',
                 fn: () => ({}),
-            },
-            textToCode: {
-                text: 'Text to Length',
-                fn: async obj => {
-                    let text = await textToCodeUI("Length");
-                    return { text };
-                },
             },
         },
     },

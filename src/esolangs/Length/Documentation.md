@@ -89,3 +89,10 @@ Push value of the argument to the stack (length of the line after the instructio
 *Mnemonic: `ror`*
 
 Rotates stack to the left e.g. `[ 7 6 5 ]` -> `[ 5 7 6 ]`
+
+## Shorthand
+My application provides to/from shorthand functionality.
+
+Shorthand length converts each operand to either a mnemonic or an integer e.g. `1234567890123456789012345␍␊12345` -> `push 5`
+
+Code in shorthand length is split by whitespace. As such, comments are not supported.

@@ -1,7 +1,10 @@
 # Befunge
 Befunge is a 2 dimensional language, with control flow moving around this 2D plane as directed by a movement vector.
 
-Default movement is (i + 0j) or `rtl` or `>`
+Starting position is `(0,0)` with movement `(1,0)` (`rtl` / `>`)
+
+Other sources:
+- https://catseye.tc/view/Befunge-93/doc/Befunge-93.markdown
 
 ## Memory
 Befunge has access to a single stack
@@ -10,6 +13,11 @@ Befunge has access to a single stack
 Strings are enclosed by `"`. When in a string, any character's ASCII value is pushed to the stack.
 
 If a digit is encountered (`[0-9]`) then this is pushed to the stack as a number.
+
+## Wrapping
+If a boundary is encountered, the current position is wrapped around to the corresponding edge.
+
+The number of times this may be done consecutively may be established in the options popup. A value `< 1` will effectively disable this feature.
 
 ## Commands
 

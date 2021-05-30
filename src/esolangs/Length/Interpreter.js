@@ -1,7 +1,7 @@
 import { Stack } from "../../classes/Stack.js";
 import { Blocker } from "../../classes/Blocker.js";
-import { arrayRotateLeft, arrayRotateRight, num } from "../../utils.js";
-import { textToLength } from './utils.js';
+import { arrayRotateLeft, arrayRotateRight, generateCountedString, num, str } from "../../utils.js";
+import { INP, ADD, SUB, DUP, COND, GOTOU, OUTN, OUTA, ROL, SWAP, MUL, DIV, POP, GOTOS, PUSH, ROR, textToLength } from './utils.js';
 
 export class LengthInterpreter {
     constructor() {
@@ -170,13 +170,142 @@ export class LengthInterpreter {
             throw new Error(`Length: error on line ${this.line + 1} '${this._lines[this.line]}':\n ${e}`);
         }
     }
+
+    /** Normal length code to shorthand */
+    toShorthand() {
+        let array = [];
+        for (let l = 0; l < this._lines.length; l++) {
+            const len = this._lines[l].length;
+            switch (len) {
+                case INP:
+                    array.push("inp");
+                    break;
+                case ADD:
+                    array.push("add");
+                    break;
+                case SUB:
+                    array.push("sub");
+                    break;
+                case DUP:
+                    array.push("dup");
+                    break;
+                case COND:
+                    array.push("cond");
+                    break;
+                case GOTOU:
+                    if (l + 1 >= this._lines.length) throw new Error(`GOTOU: expects following line as argument`);
+                    array.push("gotou");
+                    array.push(this._lines[++l].length);
+                    break;
+                case OUTN:
+                    array.push("outn");
+                    break;
+                case OUTA:
+                    array.push("outa");
+                    break;
+                case ROL:
+                    array.push("rol");
+                    break;
+                case SWAP:
+                    array.push("swap");
+                    break;
+                case MUL:
+                    array.push("mul");
+                    break;
+                case DIV:
+                    array.push("div");
+                    break;
+                case POP:
+                    array.push("pop");
+                    break;
+                case GOTOS:
+                    array.push("gotos");
+                    break;
+                case PUSH:
+                    if (l + 1 >= this._lines.length) throw new Error(`PUSH: expects following line as argument`);
+                    array.push("push");
+                    array.push(this._lines[++l].length);
+                    break;
+                case ROR:
+                    array.push("ror");
+                    break;
+                default:
+                    // throw new Error(`Line ${l}: cannot decode line of length ${len}`);
+            }
+        }
+        return array.join(' ');
+    }
+
+    /** Shorthand length code to normal length code */
+    fromShorthand(shorthand) {
+        let lines = [], input = shorthand.split(/\s+/g);
+        for (let i = 0; i < input.length; i++) {
+            const item = input[i].toLowerCase(), startI = i;
+            switch (item) {
+                case 'inp':
+                    lines.push(generateCountedString(INP));
+                    break;
+                case 'add':
+                    lines.push(generateCountedString(ADD));
+                    break;
+                case 'sub':
+                    lines.push(generateCountedString(SUB));
+                    break;
+                case 'dup':
+                    lines.push(generateCountedString(DUP));
+                    break;
+                case 'cond':
+                    lines.push(generateCountedString(COND));
+                    break;
+                case 'gotou':
+                    if (i + 1 >= input.length) throw new Error(`GOTOU: expects following item as argument`);
+                    lines.push(generateCountedString(GOTOU));
+                    lines.push(generateCountedString(num(input[++i])));
+                    break;
+                case 'outn':
+                    lines.push(generateCountedString(OUTN));
+                    break;
+                case 'outa':
+                    lines.push(generateCountedString(OUTA));
+                    break;
+                case 'rol':
+                    lines.push(generateCountedString(ROL));
+                    break;
+                case 'swap':
+                    lines.push(generateCountedString(SWAP));
+                    break;
+                case 'mul':
+                    lines.push(generateCountedString(MUL));
+                    break;
+                case 'div':
+                    lines.push(generateCountedString(DIV));
+                    break;
+                case 'pop':
+                    lines.push(generateCountedString(POP));
+                    break;
+                case 'gotos':
+                    lines.push(generateCountedString(GOTOS));
+                    break;
+                case 'push':
+                    if (i + 1 >= input.length) throw new Error(`PUSH: expects following item as argument`);
+                    lines.push(generateCountedString(PUSH));
+                    lines.push(generateCountedString(num(input[++i])));
+                    break;
+                case 'ror':
+                    lines.push(generateCountedString(ROR));
+                    break;
+                default:
+                    throw new Error(`Syntax error: '${input[i]}' (offset +${i})`);
+            }
+        }
+        return lines.join('\n');
+    }
 }
 
 LengthInterpreter.textToCode = function (text) {
     return textToLength(text);
 };
 
-const INP = 9, ADD = 10, SUB = 11, DUP = 12, COND = 13, GOTOU = 14, OUTN = 15, OUTA = 16, ROL = 17, SWAP = 18, MUL = 20, DIV = 21, POP = 23, GOTOS = 24, PUSH = 25, ROR = 27;
 const regexComment = /;.*/g;
 
 export default LengthInterpreter;

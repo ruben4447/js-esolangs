@@ -1,0 +1,18 @@
+inp
+dup
+outn
+
+push 32 outa
+push 43 outa
+push 32 outa
+
+inp
+dup
+outn
+
+push 32 outa
+push 61 outa
+push 32 outa
+
+add
+outn

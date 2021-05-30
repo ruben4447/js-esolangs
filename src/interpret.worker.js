@@ -150,6 +150,14 @@ globalThis.onmessage = async (event) => {
                     textToCode(data.args.text);
                     break;
                 }
+                case 'toShorthand': {
+                    codeToShorthand();
+                    break;
+                }
+                case 'fromShorthand': {
+                    codeFromShorthand(data.args.code);
+                    break;
+                }
                 default:
                     throw new Error(`cmd:'buttonPress': Unknown button '${data.btn}'`);
             }   
@@ -230,7 +238,41 @@ function textToCode(text) {
         let code = interpreter.constructor.textToCode(text);
         postMessage({ cmd: 'textToCode', lang: interpreter.LANG, code });
     } else {
-        let error = new Error(`${interpreter.LANG} interpreter provides no text-to-code functionality`);
+        let error = new Error(`Process could not be found`);
+        postMessage({ cmd: 'error', error });
+    }
+}
+
+function codeToShorthand() {
+    postMessage({ cmd: 'print', msg: "> interpreter --to-shorthand ./userInput --lang " + interpreter.LANG + "\n" });
+    if (interpreter && typeof interpreter.toShorthand === 'function') {
+        try {
+            let code = interpreter.toShorthand();
+            postMessage({ cmd: 'displayTextareaPopup', title: `Shorthand ${interpreter.LANG}`, text: code });
+        } catch (e) {
+            console.error(e);
+            let error = new Error(`Error whilst converting ${interpreter.LANG} to shorthand:\n${e}`);
+            postMessage({ cmd: 'error', error });
+        }
+    } else {
+        let error = new Error(`Process could not be found`);
+        postMessage({ cmd: 'error', error });
+    }
+}
+
+function codeFromShorthand(shorthand) {
+    postMessage({ cmd: 'print', msg: "> interpreter --from-shorthand ./userText.txt --lang " + interpreter.LANG + "\n" });
+    if (interpreter && typeof interpreter.fromShorthand === 'function') {
+        try {
+            let code = interpreter.fromShorthand(shorthand);
+            postMessage({ cmd: 'displayTextareaPopup', title: `${interpreter.LANG}`, text: code });
+        } catch (e) {
+            console.error(e);
+            let error = new Error(`Error whilst converting from ${interpreter.LANG} shorthand:\n${e}`);
+            postMessage({ cmd: 'error', error });
+        }
+    } else {
+        let error = new Error(`Process could not be found`);
         postMessage({ cmd: 'error', error });
     }
 }

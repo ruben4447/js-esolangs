@@ -194,3 +194,13 @@ export const randomChoice = array => array[randomInt(0, array.length)];
 export function strReplaceAt(string, index, replacement) {
     return string.substr(0, index) + replacement + string.substr(index + replacement.length);
 }
+
+/** For a given number, output a counted string e.g. 12 -> "123456789012" */
+export function generateCountedString(length) {
+    let str = '', current = 1;
+    for (let i = 0; i < length; i++) {
+        str += current.toString();
+        current = current === 9 ? 0 : current + 1;
+    }
+    return str;
+}

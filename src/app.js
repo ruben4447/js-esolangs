@@ -125,6 +125,14 @@ export function createInterpreterWorker() {
                         } else throw new Error(`cmd:'updateObject' -> unknown update action '${data.action}'`);
                         break;
                     }
+                    case 'displayTextareaPopup': {
+                        let textarea = document.createElement("textarea");
+                        textarea.rows = 15;
+                        textarea.cols = 50;
+                        textarea.value = data.text;
+                        new Popup(data.title).setContent(textarea).show();
+                        break;
+                    }
                     default:
                         console.log(data);
                         throw new Error(`Message from Worker: unknown event command '${data.cmd}'`);
@@ -219,20 +227,20 @@ export function prepareEsolangGUI(lang, updateVisuals) {
     }
 }
 
-/** Create a UI for textToBrainfuck function */
-export async function textToCodeUI(lang) {
+/** Create popup with textarea, and wait for user to press buttons before resolving Promise. */
+export async function popupTextarea(title, text = undefined, btnText = 'Go') {
     return new Promise((resolve, reject) => {
-        let popup = new Popup("Text to " + lang);
+        let popup = new Popup(title);
         let div = document.createElement("div");
         popup.setContent(div);
-        div.insertAdjacentHTML('beforeend', '<p>Convert text to ' + lang + ' code</p>');
+        if (text !== undefined) div.insertAdjacentHTML('beforeend', `<p>${text}</p>`);
         let textarea = document.createElement("textarea");
         textarea.rows = 30;
         textarea.cols = 66;
         div.appendChild(textarea);
         div.insertAdjacentHTML('beforeend', '<hr>');
         let btn = document.createElement("button");
-        btn.innerText = 'Convert';
+        btn.innerText = btnText;
         btn.addEventListener('click', () => {
             popup.hide();
             resolve(textarea.value);
