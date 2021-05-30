@@ -161,3 +161,19 @@ export function str(x) {
     return x.toString();
 }
 self.str = str;
+
+/**
+ * Read contents of file
+ * @param {File} file <input type="file" /> file
+ * @return {Promise<string>}
+ */
+export async function readFileAsText(file) {
+    return new Promise(function(resolve, reject) {
+        let reader = new FileReader();
+        reader.onload = () => {
+            resolve(reader.result);
+        };
+        reader.onerror = reject;
+        reader.readAsText(file);
+    });
+}

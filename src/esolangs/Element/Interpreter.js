@@ -18,12 +18,17 @@ export class ElementInterpreter {
         this._callbackOutput = value => {};
         /** @type {(block: Blocker) => void} */
         this._callbackInput = block => block.unblock('?');
+        /** @type {(pos: number) => void} */
+        this._callbackUpdatePos = pos => {};
 
         this._bracketMap = {}; // Map opening positions to closing positions, and vica versa
         this._loopCounts = {}; // Maps opening positions in code of loops to number of cycles left
     }
 
     get LANG() { return 'element'; }
+
+    get pos() { return this._pos; }
+    set pos(val) { this._pos = val; this._callbackUpdatePos(val); }
     setCode(code) {
         this._code = code;
         try {
@@ -33,7 +38,7 @@ export class ElementInterpreter {
         }
     }
     reset() {
-        this._pos = 0;
+        this.pos = 0;
         this._main._.length = 0;
         this._callbackUpdateStack("main", "empty");
         this._control._.length = 0;
@@ -59,10 +64,10 @@ export class ElementInterpreter {
     setVar(symbol, value) { this._vars[symbol] = value; this._callbackUpdateVars(symbol, "set", value); }
     delVar(symbol) { if (this._vars[symbol] !== undefined) { delete this._vars[symbol]; this._callbackUpdateVars(symbol, "del"); } }
 
-    /** Extract and return string from this._pos */
+    /** Extract and return string from this.pos */
     extractText() {
-        const obj = scanString(this._code.substr(this._pos), breakChars);
-        this._pos += obj.length;
+        const obj = scanString(this._code.substr(this.pos), breakChars);
+        this.pos += obj.length;
         return obj.str;
     }
 
@@ -85,10 +90,10 @@ export class ElementInterpreter {
     }
 
     async step() {
-        if (this._pos >= this._code.length) return false;
-        const char = this._code[this._pos];
+        if (this.pos >= this._code.length) return false;
+        const char = this._code[this.pos];
         if (/\s/.test(char)) {
-            this._pos++; // Skip whitespace
+            this.pos++; // Skip whitespace
         } else {
             switch (char) {
                 case '_': {
@@ -229,19 +234,19 @@ export class ElementInterpreter {
                 }
                 case '[':
                     // Open for loop
-                    if (this._loopCounts[this._pos] === undefined) this._loopCounts[this._pos] = num(this._control.top());
+                    if (this._loopCounts[this.pos] === undefined) this._loopCounts[this.pos] = num(this._control.top());
                     // Loop again?
-                    if (this._loopCounts[this._pos] <= 0) {
-                        this._pos = this._bracketMap[this._pos] - 1; // Jump to before closing bracket. Closing bracket will close loop.
+                    if (this._loopCounts[this.pos] <= 0) {
+                        this.pos = this._bracketMap[this.pos] - 1; // Jump to before closing bracket. Closing bracket will close loop.
                     }
                     break;
                 case ']': {
                     // Closing for loop
-                    let opening = this._bracketMap[this._pos];
+                    let opening = this._bracketMap[this.pos];
                     // Are there more loops left to complete?
                     if (this._loopCounts[opening] > 0) {
                         this._loopCounts[opening]--; // Decrease number of cycles
-                        this._pos = opening - 1; // As this._pos is incremented at end of function, decrement here
+                        this.pos = opening - 1; // As this.pos is incremented at end of function, decrement here
                     } else {
                         delete this._loopCounts[opening]; // Remove for loop count
                     }
@@ -249,16 +254,16 @@ export class ElementInterpreter {
                 }
                 case '{':
                     // Opening WHILE loop
-                    this._loopCounts[this._pos] = num(this._control.top()); // Get top item on stack
-                    if (this._loopCounts[this._pos] <= 0) {
-                        this._pos = this._bracketMap[this._pos] - 1; // Jump to before closing bracket. Closing bracket will close loop.
+                    this._loopCounts[this.pos] = num(this._control.top()); // Get top item on stack
+                    if (this._loopCounts[this.pos] <= 0) {
+                        this.pos = this._bracketMap[this.pos] - 1; // Jump to before closing bracket. Closing bracket will close loop.
                     }
                     break;
                 case '}':
                     // Closing WHILE loop
-                    let opening = this._bracketMap[this._pos];
+                    let opening = this._bracketMap[this.pos];
                     if (this._loopCounts[opening] > 0) {
-                        this._pos = opening - 1; // Jump to just before opening bracket; increment of this._pos at end of function will take care of this
+                        this.pos = opening - 1; // Jump to just before opening bracket; increment of this.pos at end of function will take care of this
                     } else {
                         delete this._loopCounts[opening];
                     }
@@ -279,10 +284,10 @@ export class ElementInterpreter {
                     const text = this.extractText(); // Extract text
                     if (text.length === 0) throw new Error(`Invalid token '${char}'`); // Attempted to make string, but failed
                     this.pushMain(text); // Push text to stack
-                    this._pos--;
+                    this.pos--;
                 }
             }
-            this._pos++; // Increment position (skip char)
+            this.pos++; // Increment position (skip char)
         }
         return true;
     }
@@ -295,7 +300,7 @@ export class ElementInterpreter {
                 cont = await this.step();
             } while (cont);
         } catch (e) {
-            throw new Error(`Element: error at position ${this._pos} at '${this._code[this._pos]}':\n ${e}`);
+            throw new Error(`Element: error at position ${this.pos} at '${this._code[this.pos]}':\n ${e}`);
         }
     }
 }

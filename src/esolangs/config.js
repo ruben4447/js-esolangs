@@ -3,7 +3,7 @@ import { textToCodeUI } from './../app.js';
 export const langOptions = {
     brainfuck: {
         wiki: 'https://esolangs.org/wiki/Brainfuck',
-        gui: { dataReel: 'dataReel' },
+        gui: { pointers: 'object', dataReel: 'dataReel' },
         opts: {
             numType: "uint8",
             reelLength: 10,
@@ -36,7 +36,7 @@ export const langOptions = {
     },
     element: {
         wiki: 'https://esolangs.org/wiki/Element',
-        gui: { mainStack: 'stack', controlStack: 'stack', vars: 'object' },
+        gui: { pointers: 'object', mainStack: 'stack', controlStack: 'stack', vars: 'object' },
         opts: {
             autovivification: true, // Create variable if it doesn't exist (if true), or error (if false)  [regarding instruction '~']
         },
@@ -57,7 +57,7 @@ export const langOptions = {
     },
     length: {
         wiki: 'https://esolangs.org/wiki/Length',
-        gui: { stack: 'stack' },
+        gui: { pointers: 'object', stack: 'stack' },
         opts: {
             comments: false,
             debug: false,

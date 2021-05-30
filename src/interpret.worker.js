@@ -8,6 +8,7 @@ var interpreter; // Code interpreter
 var activeBlocker; // Blocker object. May be resolve by cmd:'unblock'
 var interpreting = false;
 const statusStack = [];
+var codeCache; // Store code from 'loadCode' event
 
 function pushStatus(status) {
     statusStack.push(status);
@@ -28,12 +29,17 @@ function createInterpreter(lang, opts) {
     if (lang === "brainfuck") {
         i = new BrainfuckInterpreter(opts.numType, opts.reelLength);
         if (opts.updateVisuals) {
-            i._callbackUpdateInstructionPointer = value => self.postMessage({ cmd: 'updateInstructionPtr', value });
-            i._callbackUpdateDataPointer = value => self.postMessage({ cmd: 'updateDataPtr', value });
+            i._callbackUpdateInstructionPointer = value => {
+                self.postMessage({ cmd: 'updateInstructionPtr', value });
+                self.postMessage({ cmd: 'updateObject', name: 'pointers', action: 'set', key: 'ip', value });
+            };
+            i._callbackUpdateDataPointer = value => {
+                self.postMessage({ cmd: 'updateDataPtr', value });
+                self.postMessage({ cmd: 'updateObject', name: 'pointers', action: 'set', key: 'data', value });
+            };
             i._callbackSetData = value => self.postMessage({ cmd: 'updateData', value });
             i._callbackSetAllData = value => self.postMessage({ cmd: 'updateAllData', value });
         }
-        i._callbackOutput = msg => self.postMessage({ cmd: 'print', msg });
         i._callbackInput = inputBlocker => {
             pushStatus('Requesting GETCH');
             activeBlocker = inputBlocker;
@@ -45,8 +51,8 @@ function createInterpreter(lang, opts) {
         if (opts.updateVisuals) {
             i._callbackUpdateStack = (stack, type, value) => self.postMessage({ cmd: 'updateStack', stack, type, value });
             i._callbackUpdateVars = (symbol, action, value) => self.postMessage({ cmd: 'updateObject', name: 'vars', key: symbol, action, value });
+            i._callbackUpdatePos = value => self.postMessage({ cmd: 'updateObject', name: 'pointers', action: 'set', key: 'ip', value });
         }
-        i._callbackOutput = msg => self.postMessage({ cmd: 'print', msg });
         i._callbackInput = inputBlocker => {
             pushStatus('Requesting Input');
             activeBlocker = inputBlocker;
@@ -58,8 +64,8 @@ function createInterpreter(lang, opts) {
         i.debug = opts.debug === true;
         if (opts.updateVisuals) {
             i._callbackUpdateStack = (type, value) => self.postMessage({ cmd: 'updateStack', type, value });
+            i._callbackUpdateLineN = value => self.postMessage({ cmd: 'updateObject', name: 'pointers', action: 'set', key: 'ip', value });
         }
-        i._callbackOutput = msg => self.postMessage({ cmd: 'print', msg });
         i._callbackInput = inputBlocker => {
             pushStatus('Requesting GETCH');
             activeBlocker = inputBlocker;
@@ -68,7 +74,17 @@ function createInterpreter(lang, opts) {
     } else {
         throw new TypeError(`Unknown language '${lang}'`);
     }
+    // Add callback handler for output (as it is so common)
+    if (i._callbackOutput) {
+        i._callbackOutput = msg => self.postMessage({ cmd: 'print', msg });
+    }
     postMessage("Created interpreter for " + lang);
+
+    // Load code if there is any in the cache
+    if (codeCache !== undefined) {
+        loadCode(codeCache);
+        codeCache = undefined;
+    }
 
     return i;
 }
@@ -83,6 +99,7 @@ globalThis.onmessage = async (event) => {
                 if (data.opts.updateVisuals && interpreter instanceof BrainfuckInterpreter) payload.numArray = interpreter._data;
                 self.postMessage(payload); // Render stuff on main thread
             } catch (e) {
+                console.error(e);
                 let error = new Error(`Error whilst creating interpreter for '${data.lang}':\n${e}`);
                 postMessage({ cmd: 'error', error });
             }
@@ -140,11 +157,15 @@ globalThis.onmessage = async (event) => {
 
 /** Try loading code */
 function loadCode(code) {
-    try {
-        interpreter.setCode(code);
-    } catch (e) {
-        const error = new Error(`Error whilst loading ${interpreter.LANG} code:\n${e}`);
-        postMessage({ cmd: 'error', error });
+    if (interpreter) {
+        try {
+            interpreter.setCode(code);
+        } catch (e) {
+            const error = new Error(`Error whilst loading ${interpreter.LANG} code:\n${e}`);
+            postMessage({ cmd: 'error', error });
+        }
+    } else {
+        codeCache = code;
     }
 }
 

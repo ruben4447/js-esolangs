@@ -15,9 +15,14 @@ export class LengthInterpreter {
         this._callbackUpdateStack = (type, value) => {};
         this._callbackInput = block => { block.unblock(null); }; // Callback for user input. Takes Blocker object
         this._callbackOutput = chr => {}; // Output character
+        /** @type {(n: number) => void} */
+        this._callbackUpdateLineN = n => {};
     }
 
     get LANG() { return "length"; }
+
+    get line() { return this._line; }
+    set line(n) { this._line = n; this._callbackUpdateLineN(n); }
 
     setCode(code) {
         this._lines = code.split(/\r\n|\r|\n/g);
@@ -25,7 +30,7 @@ export class LengthInterpreter {
     }
 
     reset() {
-        this._line = 0;
+        this.line = 0;
         this._stack.dump();
         this._callbackUpdateStack("empty");
     }
@@ -34,8 +39,8 @@ export class LengthInterpreter {
     popStack() { this._callbackUpdateStack("pop"); return this._stack.pop(); }
 
     async step() {
-        if (this._line >= this._lines.length) return false;
-        const length = this._lines[this._line].length;
+        if (this.line >= this._lines.length) return false;
+        const length = this._lines[this.line].length;
         switch (length) {
             case INP: {
                 const blocker = new Blocker();
@@ -67,9 +72,9 @@ export class LengthInterpreter {
                 if (this._stack.size() < 1) throw new Error(`COND: Stack underflow`);
                 let x = num(this.popStack());
                 if (x === '0' || x === 0) {
-                    this._line++;
-                    if (this._lines[this._line].length === GOTOU || this._lines[this._line].length === PUSH) {
-                        this._line++; // Skip gotou or push instruction TWICE to skip the arguments
+                    this.line++;
+                    if (this._lines[this.line].length === GOTOU || this._lines[this.line].length === PUSH) {
+                        this.line++; // Skip gotou or push instruction TWICE to skip the arguments
                         if (this.debug) console.log(`Condition: ${x}: skip *2`);
                     } else {
                         if (this.debug) console.log(`Condition: ${x}: skip *1`);
@@ -80,9 +85,9 @@ export class LengthInterpreter {
                 break;
             }
             case GOTOU: {
-                if (this._line + 1 >= this._lines.length) throw new Error(`GOTOU: expected one argument`);
-                const value = this._lines[this._line + 1].length;
-                this._line = value - 1; // incremented at end
+                if (this.line + 1 >= this._lines.length) throw new Error(`GOTOU: expected one argument`);
+                const value = this._lines[this.line + 1].length;
+                this.line = value - 1; // incremented at end
                 if (this.debug) console.log(`GOTOU: Goto position ${value} (index ${value - 1})`);
                 break;
             }
@@ -131,12 +136,12 @@ export class LengthInterpreter {
                 break;
             case GOTOS: {
                 if (this._stack.size() < 1) throw new Error(`GOTOS: Stack underflow`);
-                this._line = Math.abs(parseInt(this.popStack())) - 1; // incremented at end
-                if (this.debug) console.log(`GOTO Stack: Goto position ${this._line + 1}`);
+                this.line = Math.abs(parseInt(this.popStack())) - 1; // incremented at end
+                if (this.debug) console.log(`GOTO Stack: Goto position ${this.line + 1}`);
                 break;
             }
             case PUSH:
-                this.pushStack(this._lines[++this._line].length);
+                this.pushStack(this._lines[++this.line].length);
                 if (this.debug) console.log(`Push value '${this._stack.top()}'`);
                 break;
             case ROR:
@@ -150,7 +155,7 @@ export class LengthInterpreter {
                 if (this.debug) console.warn(`Unable to decode line of length ${length}`);
         }
 
-        this._line++;
+        this.line++;
         return true;
     }
 
@@ -162,7 +167,7 @@ export class LengthInterpreter {
                 cont = await this.step();
             } while (cont);
         } catch (e) {
-            throw new Error(`Length: error on line ${this._line + 1} '${this._lines[this._line]}':\n ${e}`);
+            throw new Error(`Length: error on line ${this.line + 1} '${this._lines[this.line]}':\n ${e}`);
         }
     }
 }

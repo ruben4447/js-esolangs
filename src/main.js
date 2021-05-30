@@ -1,5 +1,5 @@
-import { main, elStatus, createInterpreterWorker, killInterpreterWorker, selectEsolang, interpreterWorker, editConsoleUI } from './app.js';
-import { createFieldset } from './utils.js';
+import { main, elStatus, createInterpreterWorker, killInterpreterWorker, selectEsolang, interpreterWorker, editConsoleUI, esolang } from './app.js';
+import { createFieldset, readFileAsText } from './utils.js';
 import { langOptions } from './esolangs/config.js';
 import UserControl from "./classes/UserControl.js";
 import IOConsole from "./classes/Console.js";
@@ -41,6 +41,30 @@ function _main() {
     btnEditConsole.innerText = `Edit Console`;
     btnEditConsole.addEventListener('click', () => editConsoleUI());
     p.appendChild(btnEditConsole);
+    let btnWiki = document.createElement('button');
+    btnWiki.innerHTML = `&#128279; Wiki`;
+    btnWiki.addEventListener('click', () => {
+        if (langOptions[esolang]) open(langOptions[esolang].wiki);
+    });
+    btnWiki.title = 'Open esolang wiki about selected esolang';
+    p.appendChild(btnWiki);
+    let btnUploadFile = document.createElement('button');
+    btnUploadFile.innerHTML = `&#128462; Upload File`;
+    btnUploadFile.addEventListener('click', () => inputFileUpload.click());
+    p.appendChild(btnUploadFile);
+    let inputFileUpload = document.createElement('input');
+    inputFileUpload.type = 'file';
+    inputFileUpload.addEventListener('change', async () => {
+        try {
+            const file = inputFileUpload.files[0], text = await readFileAsText(file);
+            userControl.setCode(text);
+        } catch (e) {
+            let msg = `Unable to read file ${file.name}:\n${e}`;
+            console.error(msg);
+            ioconsole.error(msg);
+        }
+    });
+
     p = document.createElement("p");
     fieldset.appendChild(p);
     p.innerText = "Current Status: ";
@@ -70,5 +94,5 @@ function _main() {
 window.addEventListener('load', async () => {
     await _main();
 
-    // selectEsolang("length", false);
+    selectEsolang("length", false);
 });
