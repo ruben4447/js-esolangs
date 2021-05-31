@@ -56,6 +56,7 @@ export class BrainfuckInterpreter {
     setCode(code) {
         this._code = this.minifyCode(code);
     }
+    getCode() { return this._code; }
 
     /** Minify program */
     minifyCode(code) {

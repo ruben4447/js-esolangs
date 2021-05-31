@@ -28,6 +28,7 @@ export class LengthInterpreter {
         this._lines = code.split(/\r\n|\r|\n/g);
         if (this.comments) this._lines = this._lines.map(l => l.replace(regexComment, ''));
     }
+    getCode() { return this._lines.join('\n'); }
 
     reset() {
         this.line = 0;

@@ -1,5 +1,19 @@
 import { popupTextarea } from './../app.js';
 
+// == THESE BUTTON OBJECTS ARE USED A LOT, SO DEFINE AS CONSTANTS FOR REUSE AND
+const btnReset = { reset: {
+    text: 'Reset',
+    fn: (obj) => ({ code: obj.getCode() }),
+}};
+const btnInterpret = { interpret: {
+    text: 'Interpret',
+    fn: (obj) => ({ code: obj.getCode() }),
+}};
+const btnStep = { step: {
+    text: 'Step',
+    fn: () => ({}),
+}};
+
 export const langOptions = {
     brainfuck: {
         wiki: 'https://esolangs.org/wiki/Brainfuck',
@@ -9,22 +23,13 @@ export const langOptions = {
             reelLength: 10,
         },
         buttons: {
-            reset: {
-                text: 'Reset',
-                fn: (obj) => ({ code: obj.getCode() }),
-            },
+            ...btnReset,
             minify: {
                 text: 'Minify',
                 fn: (obj) => ({ code: obj.getCode() }),
             },
-            interpret: {
-                text: 'Interpret',
-                fn: (obj) => ({ code: obj.getCode() }),
-            },
-            step: {
-                text: 'Step',
-                fn: () => ({}),
-            },
+            ...btnInterpret,
+            ...btnStep,
             textToCode: {
                 text: 'Text to Brainfuck',
                 fn: async () => {
@@ -41,18 +46,9 @@ export const langOptions = {
             autovivification: true, // Create variable if it doesn't exist (if true), or error (if false)  [regarding instruction '~']
         },
         buttons: {
-            reset: {
-                text: 'Reset',
-                fn: (obj) => ({ code: obj.getCode() }),
-            },
-            interpret: {
-                text: 'Interpret',
-                fn: (obj) => ({ code: obj.getCode() }),
-            },
-            step: {
-                text: 'Step',
-                fn: () => ({}),
-            },
+            ...btnReset,
+            ...btnInterpret,
+            ...btnStep,
         }
     },
     length: {
@@ -63,10 +59,7 @@ export const langOptions = {
             debug: false,
         },
         buttons: {
-            reset: {
-                text: 'Reset',
-                fn: (obj) => ({ code: obj.getCode() }),
-            },
+            ...btnReset,
             textToCode: {
                 text: 'Text to Length',
                 fn: async () => {
@@ -85,14 +78,8 @@ export const langOptions = {
                     return { code };
                 },
             },
-            interpret: {
-                text: 'Interpret',
-                fn: (obj) => ({ code: obj.getCode() }),
-            },
-            step: {
-                text: 'Step',
-                fn: () => ({}),
-            },
+            ...btnInterpret,
+            ...btnStep,
         },
     },
     befunge: {
@@ -104,18 +91,20 @@ export const langOptions = {
             selfModification: true,
         },
         buttons: {
-            reset: {
-                text: 'Reset',
-                fn: (obj) => ({ code: obj.getCode() }),
-            },
-            interpret: {
-                text: 'Interpret',
-                fn: (obj) => ({ code: obj.getCode() }),
-            },
-            step: {
-                text: 'Step',
-                fn: () => ({}),
-            },
+            ...btnReset,
+            ...btnInterpret,
+            ...btnStep,
+        },
+    },
+    slashes: {
+        wiki: 'https://esolangs.org/wiki////',
+        gui: { data: 'object' },
+        opts: {
+            debug: false,
+        },
+        buttons: {
+            ...btnInterpret,
+            ...btnStep,
         },
     },
 };

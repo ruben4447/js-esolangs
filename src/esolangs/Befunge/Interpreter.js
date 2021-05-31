@@ -26,6 +26,8 @@ export class BefungeInterpreter {
         this._callbackOutput = value => {};
         /** @type {(mode: "getch" | "input", block: Blocker) => void} */
         this._callbackInput = (mode, block) => {};
+        /** @type {(x: number, y: number, chr: string) => void} */
+        this._callbackUpdateCode = () => {};
     }
 
     get LANG() { return "befunge"; }
@@ -64,6 +66,7 @@ export class BefungeInterpreter {
         this._lines = code.split(/\r\n|\r|\n/g);
         padLines(this._lines, ' '); // Make every line the same length
     }
+    getCode() { return this._lines.join('\n'); }
 
     pushStack(value) { this._stack.push(value); this._callbackUpdateStack("push", value); }
     popStack() { this._callbackUpdateStack("pop"); return this._stack.pop(); }
@@ -238,14 +241,15 @@ export class BefungeInterpreter {
                 this.pushStack(num(n));
             } else if (this.selfModification && c === 'p') {
                 // throw new Error(`IMPLEMENTATION ERROR: operator 'p' is not implemented`);
-                let y = num(this.popStack()), x = num(this.popStack()), val = num(this.popStack());
+                let y = num(this.popStack()), x = num(this.popStack()), val = num(this.popStack()), chr = str(String.fromCharCode(val));
                 try {
                     if (y < 0 || y >= this._lines.length) throw new Error(`Y position '${y}' is out of bounds`);
                     if (x < 0 || x >= this._lines[y].length) throw new Error(`X position '${x}' is out of bounds`);
-                    this._lines[y] = strReplaceAt(this._lines[y], x, str(String.fromCharCode(val)));
+                    this._lines[y] = strReplaceAt(this._lines[y], x, chr);
                 } catch (e) {
                     throw new Error(`PUT: unable to place value '${val}' at (${x},${y}):\n${e}`);
                 }
+                this._callbackUpdateCode(x, y, chr);
             } else {
                 throw new Error(`SYNTAX ERROR: unknown character '${c}'`);
             }

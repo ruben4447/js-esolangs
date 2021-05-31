@@ -204,3 +204,13 @@ export function generateCountedString(length) {
     }
     return str;
 }
+
+/** Replace {pattern} with {replacement} {n} times */
+export function stringReplace(string, pattern, replacement, n = 1) {
+    for (let k = 0; k < n; k++) {
+        let i = string.indexOf(pattern);
+        if (i === -1) break;
+        string = strReplaceAt(string, i, replacement);
+    }
+    return string;
+}

@@ -20,7 +20,7 @@ export class UserControl {
     }
 
     getCode() { return this._textarea.value; }
-    setCode(text) { this._textarea.value = text; this._callbackChange(text); }
+    setCode(text, callCb = true) { this._textarea.value = text; if (callCb) this._callbackChange(text); }
 
     /**
      * Set buttons. 

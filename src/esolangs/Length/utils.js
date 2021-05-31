@@ -1,3 +1,5 @@
+import { generateCountedString } from "../../utils.js";
+
 export const INP = 9, ADD = 10, SUB = 11, DUP = 12, COND = 13, GOTOU = 14, OUTN = 15, OUTA = 16, ROL = 17, SWAP = 18, MUL = 20, DIV = 21, POP = 23, GOTOS = 24, PUSH = 25, ROR = 27;
 
 export function textToLength(text) {
@@ -8,7 +10,7 @@ export function textToLength(text) {
 
         let delta = charCode - topValue;
         if (delta !== 0) {
-            lines.push("1234567890123456789012345", "A".repeat(Math.abs(delta))); // Push delta to stack
+            lines.push("1234567890123456789012345", generateCountedString(Math.abs(delta))); // Push delta to stack
             lines.push(delta < 0 ? "12345678901" : "1234567890"); // Subtract or add?
         }
         lines.push("123456789012", "1234567890123456"); // Duplicate then print

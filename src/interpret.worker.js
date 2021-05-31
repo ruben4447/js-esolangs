@@ -2,6 +2,7 @@ import BrainfuckInterpreter from "./esolangs/Brainfuck/Interpreter.js";
 import ElementInterpreter from "./esolangs/Element/Interpreter.js";
 import LengthInterpreter from "./esolangs/Length/Interpreter.js";
 import BefungeInterpreter from "./esolangs/Befunge/Interpreter.js";
+import SlashesInterpreter from "./esolangs/Slashes/Interpreter.js";
 import { num } from "./utils.js";
 
 var interpreter; // Code interpreter
@@ -61,7 +62,6 @@ function createInterpreter(lang, opts) {
     } else if (lang === 'length') {
         i = new LengthInterpreter();
         i.comments = opts.comments === true;
-        i.debug = opts.debug === true;
         if (opts.updateVisuals) {
             i._callbackUpdateStack = (type, value) => self.postMessage({ cmd: 'updateStack', type, value });
             i._callbackUpdateLineN = value => self.postMessage({ cmd: 'updateObject', name: 'pointers', action: 'set', key: 'ip', value });
@@ -73,7 +73,6 @@ function createInterpreter(lang, opts) {
         };
     } else if (lang === 'befunge') {
         i = new BefungeInterpreter();
-        i.debug = opts.debug === true;
         i.wrapLimit = num(opts.wrapLimit);
         i.selfModification = opts.selfModification === true;
         if (opts.updateVisuals) {
@@ -90,11 +89,18 @@ function createInterpreter(lang, opts) {
                 self.postMessage({ cmd: 'reqInput' });
             }
         };
+    } else if (lang === 'slashes') {
+        i = new SlashesInterpreter();
+        if (opts.updateVisuals) {
+            i._callbackChangeData = (key, value) => self.postMessage({ cmd: 'updateObject', name: 'data', action: 'set', key, value, });
+        }
     } else {
         throw new TypeError(`Unknown language '${lang}'`);
     }
-    // Add callback handler for output (as it is so common)
+    // Add common callbacks
     if (i._callbackOutput) i._callbackOutput = msg => self.postMessage({ cmd: 'print', msg });
+    if (opts.updateVisuals && i._callbackUpdateCode) i._callbackUpdateCode = () => self.postMessage({ cmd: 'setCode', code: i.getCode() });
+    if(i.debug !== undefined) i.debug = opts.debug === true;
     postMessage("Created interpreter for " + lang);
 
     // Load code if there is any in the cache
@@ -197,9 +203,9 @@ function loadCode(code) {
 /** Interpret code given */
 async function interpret(code) {
     if (interpreting) throw new Error(`Worker is already busy interpreting!`);
+    interpreting = true;
     postMessage({ cmd: 'print', msg: `\n> interpreter execute --lang ${interpreter.LANG} --file ./userInput\n` });
     pushStatus(`Interpreting ${interpreter.LANG}`);
-    interpreting = true;
     if (typeof code === 'string') loadCode(code);
     let error, timeStart = Date.now();
     try {
@@ -218,8 +224,8 @@ async function interpret(code) {
 async function step() {
     // Interpret one step only
     if (interpreting) throw new Error(`Worker is already busy interpreting!`);
-    pushStatus(`Stepping ${interpreter.LANG}`);
     interpreting = true;
+    pushStatus(`Stepping ${interpreter.LANG}`);
     let error, cont;
     try {
         cont = await interpreter.step();
@@ -228,7 +234,7 @@ async function step() {
     }
     popStatus();
     if (error) self.postMessage({ cmd: 'error', error });
-    if (!cont) self.postMessage({ cmd: 'print', msg: `Unable to complete step\n` });
+    if (!cont) self.postMessage({ cmd: 'print', msg: `Execution complete.\n` });
     interpreting = false;
 }
 

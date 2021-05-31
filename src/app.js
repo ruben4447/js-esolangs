@@ -46,6 +46,10 @@ export function createInterpreterWorker() {
                             components.dataReel.setPtr(0);
                         }
                         break;
+                    case 'setCode':
+                        // Set code in userControl
+                        userControl.setCode(data.code, false);
+                        break;
                     case 'interpreterResponse':
                         let str = `Execution terminated with exit code ${data.ok ? 0 : 1} (${data.time} ms)`;
                         ioconsole.newline(str + '\n');
@@ -149,11 +153,13 @@ export function killInterpreterWorker() {
     if (interpreterWorker) {
         interpreterWorker.terminate();
         interpreterWorker = undefined;
+        console.log(`%cinterpreterWorker terminated.`, `color:tomato;font-family:monospace;`);
         return true;
     } else return false;
 }
 
-export function selectEsolang(lang, allowConfig = true) {
+export function selectEsolang(lang, updateVisuals = true, allowConfig = true) {
+    if (langOptions[lang] === undefined) throw new Error(`Language "${lang}" is not supported`);
     // Tell worker to setup esolang. Worker will sent back a response
     const initEsolang = () => interpreterWorker.postMessage({ cmd: 'setEsolang', lang, opts: optObject });
 
@@ -167,7 +173,7 @@ export function selectEsolang(lang, allowConfig = true) {
 
     esolang = lang;
     userControl.setButtons(langOptions[lang].buttons);
-    const optObject = { updateVisuals: true, ...langOptions[lang].opts };
+    const optObject = { updateVisuals, ...langOptions[lang].opts };
     if (allowConfig) {
         const popup = new Popup(`Language Configuration for ${lang}`), popupContent = document.createElement("div");
         popup.setContent(popupContent);

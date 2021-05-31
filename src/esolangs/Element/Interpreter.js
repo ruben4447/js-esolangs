@@ -37,6 +37,8 @@ export class ElementInterpreter {
             throw new Error(`Found unmatched bracket:\n${e}`);
         }
     }
+    getCode() { return this._code; }
+    
     reset() {
         this.pos = 0;
         this._main._.length = 0;
