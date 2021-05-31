@@ -1,25 +1,24 @@
 import { Stack } from '../../classes/Stack.js';
 import { scanString, regexLetter, scanNumber, regexNumber, arrayMoveItem, getMatchingBracket, bracketMap, num, str } from '../../utils.js';
 import Blocker from '../../classes/Blocker.js';
+import BaseInterpreter from '../BaseInterpreter.js';
 
-export class ElementInterpreter {
+export class ElementInterpreter extends BaseInterpreter {
     constructor() {
+        super();
         this.autovivification = false; // '~' command: if true, create variable and initialise to '' if it doesn't exist. If false, throw error.
-        this._code = '';
         this._pos = 0;
         this._main = new Stack();
         this._control = new Stack();
         this._vars = {};
         /** @type {(stack: "main" | "control", type: "push" | "pop" | "empty" | "update", value?: any) => void} */
-        this._callbackUpdateStack = (stack, type, value) => {};
+        this._callbackUpdateStack = (stack, type, value) => { };
         /** @type {(symbol: string, action: "set" | "del" | "clear", value: string | number) => void} */
-        this._callbackUpdateVars = (symbol, action, value) => {};
-        /** @type {(value: string) => void} */
-        this._callbackOutput = value => {};
-        /** @type {(block: Blocker) => void} */
-        this._callbackInput = block => block.unblock('?');
+        this._callbackUpdateVars = (symbol, action, value) => { };
+        this._callbackOutput = () => { };
+        this._callbackInput = () => { };
         /** @type {(pos: number) => void} */
-        this._callbackUpdatePos = pos => {};
+        this._callbackUpdatePos = pos => { };
 
         this._bracketMap = {}; // Map opening positions to closing positions, and vica versa
         this._loopCounts = {}; // Maps opening positions in code of loops to number of cycles left
@@ -30,15 +29,14 @@ export class ElementInterpreter {
     get pos() { return this._pos; }
     set pos(val) { this._pos = val; this._callbackUpdatePos(val); }
     setCode(code) {
-        this._code = code;
+        super.setCode(code);
         try {
             this.constructBracketMap();
         } catch (e) {
             throw new Error(`Found unmatched bracket:\n${e}`);
         }
     }
-    getCode() { return this._code; }
-    
+
     reset() {
         this.pos = 0;
         this._main._.length = 0;
@@ -295,13 +293,10 @@ export class ElementInterpreter {
     }
 
     async interpret(code) {
-        if (code !== undefined) this.setCode(code);
         try {
-            let cont;
-            do {
-                cont = await this.step();
-            } while (cont);
+            super.interpret(code);
         } catch (e) {
+            console.error(e);
             throw new Error(`Element: error at position ${this.pos} at '${this._code[this.pos]}':\n ${e}`);
         }
     }

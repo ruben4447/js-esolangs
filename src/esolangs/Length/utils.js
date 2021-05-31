@@ -1,6 +1,7 @@
 import { generateCountedString } from "../../utils.js";
 
 export const INP = 9, ADD = 10, SUB = 11, DUP = 12, COND = 13, GOTOU = 14, OUTN = 15, OUTA = 16, ROL = 17, SWAP = 18, MUL = 20, DIV = 21, POP = 23, GOTOS = 24, PUSH = 25, ROR = 27;
+export const regexComment = /;.*/g;
 
 export function textToLength(text) {
     let lines = [], topValue = 0;

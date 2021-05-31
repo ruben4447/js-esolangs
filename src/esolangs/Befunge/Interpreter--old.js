@@ -1,11 +1,10 @@
-import BaseInterpreter from '../BaseInterpreter.js';
 import { Stack } from '../../classes/Stack.js';
 import { num, padLines, randomChoice, regexNumber, regexWhitespace, str, strReplaceAt } from '../../utils.js';
 import Blocker from '../../classes/Blocker.js';
 
-export class BefungeInterpreter extends BaseInterpreter {
+export class BefungeInterpreter {
     constructor() {
-        super();
+        this._code = "";
         this._lines = [];
         this._stack = new Stack();
         this.debug = false;
@@ -50,7 +49,6 @@ export class BefungeInterpreter extends BaseInterpreter {
     get wrapCount() { return this._wrapCount; }
     set wrapCount(n) { this._wrapCount = n; /* this._callbackUpdatePtr("wrap", n); */ }
 
-    /** @overload */
     reset() {
         this.x = 0;
         this.y = 0;
@@ -62,13 +60,11 @@ export class BefungeInterpreter extends BaseInterpreter {
         this._callbackUpdateStack("empty");
     }
 
-    /** @overload */
     setCode(code) {
         this._code = code;
         this._lines = code.split(/\r\n|\r|\n/g);
         padLines(this._lines, ' '); // Make every line the same length
     }
-    /** @overload */
     getCode() { return this._lines.join('\n'); }
 
     pushStack(value) { this._stack.push(value); this._callbackUpdateStack("push", value); }
@@ -267,12 +263,14 @@ export class BefungeInterpreter extends BaseInterpreter {
         }
     }
 
-    /** @overload */
     async interpret(code) {
+        if (code !== undefined) this.setCode(code);
         try {
-            await super.interpret(code);
+            let cont;
+            do {
+                cont = await this.step();
+            } while (cont);
         } catch (e) {
-            console.error(e); // Log original
             throw new Error(`Befunge: error at position (${this.mx},${this.my}) '${this.get()}':\n ${e}`);
         }
     }

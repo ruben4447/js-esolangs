@@ -1,16 +1,16 @@
-import { stringReplace } from "../../utils.js";
+import BaseInterpreter from "../BaseInterpreter.js";
 
-export class SlashesInterpreter {
+export class SlashesInterpreter extends BaseInterpreter {
     constructor() {
-        this._code = '';
+        super();
         this.debug = false;
         this._pattern = '';
         this._replacement = '';
 
-        this._callbackOutput = () => {};
-        this._callbackUpdateCode = () => {};
+        this._callbackOutput = () => { };
+        this._callbackUpdateCode = () => { };
         /** @type {(name: string, value: string | number) => void} */
-        this._callbackChangeData = () => {};
+        this._callbackChangeData = () => { };
     }
 
     get LANG() { return 'slashes'; }
@@ -19,9 +19,6 @@ export class SlashesInterpreter {
     set pattern(value) { this._pattern = value; this._callbackChangeData("pat", value); }
     get replacement() { return this._replacement; }
     set replacement(value) { this._replacement = value; this._callbackChangeData("rep", value); }
-
-    setCode(code) { this._code = code; }
-    getCode() { return this._code; }
 
     reset() {
         this.pattern = '';
@@ -55,17 +52,7 @@ export class SlashesInterpreter {
                 this.replacement = '';
             }
         }
-        // while (this._code.length !== 0 && this._code.includes(args[0])) this._code = this._code.replace(args[0], args[1]); // Replace PATTERN with REPLACEMENT as many times as possible
-        // if (this.debug) console.log(` -> '${this._code}'`);
         return this._code.length !== 0;
-    }
-
-    async interpret(code) {
-        if (code !== undefined) this.setCode(code);
-        let cont;
-        do {
-            cont = await this.step();
-        } while (cont);
     }
 }
 

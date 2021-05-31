@@ -41,11 +41,6 @@ function createInterpreter(lang, opts) {
             i._callbackSetData = value => self.postMessage({ cmd: 'updateData', value });
             i._callbackSetAllData = value => self.postMessage({ cmd: 'updateAllData', value });
         }
-        i._callbackInput = inputBlocker => {
-            pushStatus('Requesting GETCH');
-            activeBlocker = inputBlocker;
-            self.postMessage({ cmd: 'reqGetch' });
-        };
     } else if (lang === 'element') {
         i = new ElementInterpreter();
         i.autovivification = opts.autovivification === true;
@@ -54,11 +49,6 @@ function createInterpreter(lang, opts) {
             i._callbackUpdateVars = (symbol, action, value) => self.postMessage({ cmd: 'updateObject', name: 'vars', key: symbol, action, value });
             i._callbackUpdatePos = value => self.postMessage({ cmd: 'updateObject', name: 'pointers', action: 'set', key: 'ip', value });
         }
-        i._callbackInput = inputBlocker => {
-            pushStatus('Requesting Input');
-            activeBlocker = inputBlocker;
-            self.postMessage({ cmd: 'reqInput' });
-        };
     } else if (lang === 'length') {
         i = new LengthInterpreter();
         i.comments = opts.comments === true;
@@ -66,11 +56,6 @@ function createInterpreter(lang, opts) {
             i._callbackUpdateStack = (type, value) => self.postMessage({ cmd: 'updateStack', type, value });
             i._callbackUpdateLineN = value => self.postMessage({ cmd: 'updateObject', name: 'pointers', action: 'set', key: 'ip', value });
         }
-        i._callbackInput = inputBlocker => {
-            pushStatus('Requesting GETCH');
-            activeBlocker = inputBlocker;
-            self.postMessage({ cmd: 'reqGetch' });
-        };
     } else if (lang === 'befunge') {
         i = new BefungeInterpreter();
         i.wrapLimit = num(opts.wrapLimit);
@@ -79,16 +64,6 @@ function createInterpreter(lang, opts) {
             i._callbackUpdateStack = (type, value) => self.postMessage({ cmd: 'updateStack', type, value });
             i._callbackUpdatePtr = (key, value) => self.postMessage({ cmd: 'updateObject', name: 'pointers', action: 'set', key, value });
         }
-        i._callbackInput = (mode, inputBlocker) => {
-            activeBlocker = inputBlocker;
-            if (mode === 'getch') {
-                pushStatus('Requesting GETCH');
-                self.postMessage({ cmd: 'reqGetch' });
-            } else {
-                pushStatus('Requesting Input');
-                self.postMessage({ cmd: 'reqInput' });
-            }
-        };
     } else if (lang === 'slashes') {
         i = new SlashesInterpreter();
         if (opts.updateVisuals) {
@@ -98,9 +73,23 @@ function createInterpreter(lang, opts) {
         throw new TypeError(`Unknown language '${lang}'`);
     }
     // Add common callbacks
-    if (i._callbackOutput) i._callbackOutput = msg => self.postMessage({ cmd: 'print', msg });
+    if (i._callbackOutput) i._callbackOutput = msg => self.postMessage({ cmd: 'print', msg }); // PRINT MESSAGE
+    if (i._callbackGetch) { // REQUEST SINGLE CHARACTER INPUT
+        i._callbackGetch = b => {
+            pushStatus('Requesting GETCH...');
+            activeBlocker = b;
+            self.postMessage({ cmd: 'reqGetch' });
+        };
+    }
+    if (i._callbackInput) {
+        i._callbackInput = b => {
+            activeBlocker = b;
+            pushStatus('Requesting Input...');
+            self.postMessage({ cmd: 'reqInput' });
+        };
+    }
     if (opts.updateVisuals && i._callbackUpdateCode) i._callbackUpdateCode = () => self.postMessage({ cmd: 'setCode', code: i.getCode() });
-    if(i.debug !== undefined) i.debug = opts.debug === true;
+    if (i.debug !== undefined) i.debug = opts.debug === true;
     postMessage("Created interpreter for " + lang);
 
     // Load code if there is any in the cache
@@ -166,7 +155,7 @@ globalThis.onmessage = async (event) => {
                 }
                 default:
                     throw new Error(`cmd:'buttonPress': Unknown button '${data.btn}'`);
-            }   
+            }
         } else if (data.cmd === 'unblock') {
             // Request unblock of "activeBlocker"
             if (activeBlocker) {

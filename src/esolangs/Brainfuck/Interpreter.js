@@ -1,9 +1,11 @@
 import { Blocker } from '../../classes/Blocker.js';
 import { getMatchingBracket } from '../../utils.js';
+import BaseInterpreter from '../BaseInterpreter.js';
 import { textToBrainfuck } from './utils.js';
 
-export class BrainfuckInterpreter {
+export class BrainfuckInterpreter extends BaseInterpreter {
     constructor(numType, reelLength) {
+        super();
         if (reelLength <= 0 || isNaN(reelLength) || !isFinite(reelLength)) throw new Error(`Invalid reel length '${reelLength}'`);
         this._ntype = numType;
         this._data = (() => {
@@ -17,16 +19,15 @@ export class BrainfuckInterpreter {
                 default: throw new TypeError(`Unknown type ${numType}`);
             }
         })();
-        this._code = '';
         this._ip = 0; // Instruction Pointer -> pointer in code
         this._dp = 0; // Data Pointer -> pointer for this._data
 
-        this._callbackUpdateDataPointer = dp => {}; // Update data pointer
-        this._callbackUpdateInstructionPointer = ip => {}; // Update instruction pointer
-        this._callbackSetData = value => {}; // Update value at current ptr value
-        this._callbackSetAllData = array => {}; // Reset this._data
-        this._callbackOutput = chr => {}; // Output character
-        this._callbackInput = block => { block.unblock(null); }; // Callback for user input. Takes Blocker object
+        this._callbackUpdateDataPointer = dp => { }; // Update data pointer
+        this._callbackUpdateInstructionPointer = ip => { }; // Update instruction pointer
+        this._callbackSetData = value => { }; // Update value at current ptr value
+        this._callbackSetAllData = array => { }; // Reset this._data
+        this._callbackOutput = () => { }; // Output character
+        this._callbackGetch = () => { }; // Callback for user input. Takes Blocker object
     }
 
     get LANG() { return 'brainfuck'; }
@@ -53,10 +54,7 @@ export class BrainfuckInterpreter {
         this._callbackSetAllData(this._data);
     }
 
-    setCode(code) {
-        this._code = this.minifyCode(code);
-    }
-    getCode() { return this._code; }
+    setCode(code) { this._code = this.minifyCode(code); }
 
     /** Minify program */
     minifyCode(code) {
@@ -89,7 +87,7 @@ export class BrainfuckInterpreter {
                 break;
             case ',': {
                 const blocker = new Blocker();
-                this._callbackInput(blocker);
+                this._callbackGetch(blocker);
                 let chr = await blocker.block(); // Wait for character
                 this.setValue(chr.charCodeAt(0));
                 break;
@@ -105,13 +103,6 @@ export class BrainfuckInterpreter {
         }
         this.ip++;
         return true;
-    }
-
-    async interpret() {
-        let cont;
-        do {
-            cont = await this.step();
-        } while (cont);
     }
 }
 

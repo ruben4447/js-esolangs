@@ -1,10 +1,12 @@
+import BaseInterpreter from "../BaseInterpreter.js";
 import { Stack } from "../../classes/Stack.js";
 import { Blocker } from "../../classes/Blocker.js";
 import { arrayRotateLeft, arrayRotateRight, generateCountedString, num, str } from "../../utils.js";
-import { INP, ADD, SUB, DUP, COND, GOTOU, OUTN, OUTA, ROL, SWAP, MUL, DIV, POP, GOTOS, PUSH, ROR, textToLength } from './utils.js';
+import { INP, ADD, SUB, DUP, COND, GOTOU, OUTN, OUTA, ROL, SWAP, MUL, DIV, POP, GOTOS, PUSH, ROR, textToLength, regexComment } from './utils.js';
 
-export class LengthInterpreter {
+export class LengthInterpreter extends BaseInterpreter {
     constructor() {
+        super();
         this._stack = new Stack();
         this._lines = [];
         this._line = 0;
@@ -12,11 +14,11 @@ export class LengthInterpreter {
         this.debug = false;
 
         /** @type {(type: "push" | "pop" | "empty" | "update", value?: any) => void} */
-        this._callbackUpdateStack = (type, value) => {};
-        this._callbackInput = block => { block.unblock(null); }; // Callback for user input. Takes Blocker object
-        this._callbackOutput = chr => {}; // Output character
+        this._callbackUpdateStack = (type, value) => { };
+        this._callbackGetch = () => { }; // Callback for user input. Takes Blocker object
+        this._callbackOutput = chr => { }; // Output character
         /** @type {(n: number) => void} */
-        this._callbackUpdateLineN = n => {};
+        this._callbackUpdateLineN = n => { };
     }
 
     get LANG() { return "length"; }
@@ -25,6 +27,7 @@ export class LengthInterpreter {
     set line(n) { this._line = n; this._callbackUpdateLineN(n); }
 
     setCode(code) {
+        super.setCode(code);
         this._lines = code.split(/\r\n|\r|\n/g);
         if (this.comments) this._lines = this._lines.map(l => l.replace(regexComment, ''));
     }
@@ -45,7 +48,7 @@ export class LengthInterpreter {
         switch (length) {
             case INP: {
                 const blocker = new Blocker();
-                this._callbackInput(blocker);
+                this._callbackGetch(blocker);
                 let chr = await blocker.block(); // Wait for character
                 this.pushStack(num(chr.charCodeAt(0)));
                 if (this.debug) console.log(`Got Input: '${this._stack.top()}'`);
@@ -161,12 +164,8 @@ export class LengthInterpreter {
     }
 
     async interpret(code) {
-        if (code !== undefined) this.setCode(code);
         try {
-            let cont;
-            do {
-                cont = await this.step();
-            } while (cont);
+            await super.interpret(code);
         } catch (e) {
             throw new Error(`Length: error on line ${this.line + 1} '${this._lines[this.line]}':\n ${e}`);
         }
@@ -231,7 +230,7 @@ export class LengthInterpreter {
                     array.push("ror");
                     break;
                 default:
-                    // throw new Error(`Line ${l}: cannot decode line of length ${len}`);
+                // throw new Error(`Line ${l}: cannot decode line of length ${len}`);
             }
         }
         return array.join(' ');
@@ -306,7 +305,5 @@ export class LengthInterpreter {
 LengthInterpreter.textToCode = function (text) {
     return textToLength(text);
 };
-
-const regexComment = /;.*/g;
 
 export default LengthInterpreter;

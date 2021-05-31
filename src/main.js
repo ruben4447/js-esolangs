@@ -6,7 +6,7 @@ import IOConsole from "./classes/Console.js";
 
 export var userControl, ioconsole;
 
-function _main() {  
+function _main() {
     // == SETUP HTML ==
     document.body.appendChild(main);
 
@@ -91,8 +91,10 @@ function _main() {
     });
 }
 
+
 window.addEventListener('load', async () => {
     await _main();
 
-    // selectEsolang("slashes", true, false);
+    selectEsolang("slashes", true, false);
+    userControl.setCode(`/foo/Hello, world!//bar/foo/bar`);
 });
