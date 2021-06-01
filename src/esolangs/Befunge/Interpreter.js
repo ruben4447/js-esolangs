@@ -8,7 +8,6 @@ export class BefungeInterpreter extends BaseInterpreter {
         super();
         this._lines = [];
         this._stack = new Stack();
-        this.debug = false;
         this.selfModification = true; // Allow 'g' and 'p' commands
 
         this._x = 0; // X position
@@ -113,20 +112,20 @@ export class BefungeInterpreter extends BaseInterpreter {
         if (this.y < 0) {
             this.y = this._lines.length - 1;
             this.wrapCount++;
-            if (this.debug) console.log(`Wrap y cond 1 : ${this.y}`);
+            this.debug(`Wrap y cond 1 : ${this.y}`);
         } else if (this.y >= this._lines.length) {
             this.y = 0;
-            if (this.debug) console.log(`Wrap y cond 2 : ${this.y}`);
+            this.debug(`Wrap y cond 2 : ${this.y}`);
             this.wrapCount++;
         }
         if (this.x < 0) {
             this.x = this._lines[this.y].length - 1;
             this.wrapCount++;
-            if (this.debug) console.log(`Wrap x cond 1 : ${this.x}`);
+            this.debug(`Wrap x cond 1 : ${this.x}`);
         } else if (this.x >= this._lines[this.y].length) {
             this.x = 0;
             this.wrapCount++;
-            if (this.debug) console.log(`Wrap x cond 2 : ${this.x}`);
+            this.debug(`Wrap x cond 2 : ${this.x}`);
         }
 
         // Check wrap count
@@ -138,7 +137,7 @@ export class BefungeInterpreter extends BaseInterpreter {
             }
         } else {
             const c = this._lines[this._y][this._x];
-            if (this.debug) console.log(`Char '${c}' at (${this._x},${this._y}) movVec (${this._mx},${this._my})`);
+            this.debug(`Char '${c}' at (${this._x},${this._y}) movVec (${this._mx},${this._my})`);
 
             // Reset reflection count if not direction control or invisible newline
             if (!this.inString && c !== '<' && c !== '>' && c !== '^' && c !== 'v' && c !== '\n' && c !== '\r') {
@@ -147,10 +146,10 @@ export class BefungeInterpreter extends BaseInterpreter {
 
             if (c === '"') {
                 this.inString = !this.inString;
-                if (this.debug) console.log(`\tIn String: ${this.inString}`);
+                this.debug(`\tIn String: ${this.inString}`);
             } else if (this.inString) {
                 this.pushStack(num(c.charCodeAt(0))); // Push ASCII value of character
-                if (this.debug) console.log(`\tPush char code for '${c}' : ${this._stack.top()}`);
+                this.debug(`\tPush char code for '${c}' : ${this._stack.top()}`);
             } else if (regexNumber.test(c)) {
                 this.pushStack(num(c)); // Push integer
             } else if (regexWhitespace.test(c)) {
@@ -259,7 +258,7 @@ export class BefungeInterpreter extends BaseInterpreter {
 
             // Apply movement vector
             if (this.mx === 0 && this.my === 0) throw new Error(`RUNTIME ERROR: movement vector is zero`);
-            if (this.debug) console.log(`Apply movVector: x = ${this.x} + ${this.mx}; y = ${this.y} + ${this.my}`);
+            this.debug(`Apply movVector: x = ${this.x} + ${this.mx}; y = ${this.y} + ${this.my}`);
             this.x += this.mx;
             this.y += this.my;
 

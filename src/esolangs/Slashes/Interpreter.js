@@ -3,7 +3,6 @@ import BaseInterpreter from "../BaseInterpreter.js";
 export class SlashesInterpreter extends BaseInterpreter {
     constructor() {
         super();
-        this.debug = false;
         this._pattern = '';
         this._replacement = '';
 
@@ -39,7 +38,7 @@ export class SlashesInterpreter extends BaseInterpreter {
                 }
             }
             if (toPrint.length !== 0) this._callbackOutput(toPrint); // Print stuff (do it in one go to avoid latency on main thread)
-            if (this.debug) console.log(`Print '${toPrint}'; pattern '${args[0]}'; replacement '${args[1]}'; string '${this._code}'`);
+            this.debug(`Print '${toPrint}'; pattern '${args[0]}'; replacement '${args[1]}'; string '${this._code}'`);
             this.pattern = args[0];
             this.replacement = args[1];
         } else {

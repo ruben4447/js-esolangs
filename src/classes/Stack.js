@@ -15,7 +15,7 @@ export class Stack {
      * Is the stack empty?
      * @returns {boolean}
      */
-    empty() { return this._length === 0; }
+    empty() { return this._.length === 0; }
 
     /** Empty the stack. */
     dump() { this._.length = 0; }
@@ -80,7 +80,7 @@ export class HTMLStack {
             this.updateSize();
         }
     }
-    
+
     /** Update stack size */
     updateSize() {
         this._tr.firstElementChild.innerText = `Stack [${this._stack.size()}]`; // Update stack size label

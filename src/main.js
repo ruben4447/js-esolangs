@@ -91,10 +91,11 @@ function _main() {
     });
 }
 
+var CODE = `Hello, aunts! Around, around, swim!`;
 
 window.addEventListener('load', async () => {
     await _main();
 
-    selectEsolang("slashes", true, false);
-    userControl.setCode(`/foo/Hello, world!//bar/foo/bar`);
+    selectEsolang("beatnik", true, false);
+    if (CODE.length !== 0) userControl.setCode(CODE);
 });

@@ -11,7 +11,6 @@ export class LengthInterpreter extends BaseInterpreter {
         this._lines = [];
         this._line = 0;
         this.comments = false; // Allow comments? (anything after ';' will be ignored)
-        this.debug = false;
 
         /** @type {(type: "push" | "pop" | "empty" | "update", value?: any) => void} */
         this._callbackUpdateStack = (type, value) => { };
@@ -51,25 +50,25 @@ export class LengthInterpreter extends BaseInterpreter {
                 this._callbackGetch(blocker);
                 let chr = await blocker.block(); // Wait for character
                 this.pushStack(num(chr.charCodeAt(0)));
-                if (this.debug) console.log(`Got Input: '${this._stack.top()}'`);
+                this.debug(`Got Input: '${this._stack.top()}'`);
                 break;
             }
             case ADD: {
                 if (this._stack.size() < 2) throw new Error(`ADD: Stack underflow`);
                 const a = num(this.popStack()), b = num(this.popStack());
                 this.pushStack(b + a);
-                if (this.debug) console.log(`Add ${b} + ${a} = ${this._stack.top()}`);
+                this.debug(`Add ${b} + ${a} = ${this._stack.top()}`);
                 break;
             }
             case SUB: {
                 if (this._stack.size() < 2) throw new Error(`SUB: Stack underflow`);
                 const a = num(this.popStack()), b = num(this.popStack());
                 this.pushStack(b - a);
-                if (this.debug) console.log(`Subtract ${b} - ${a} = ${this._stack.top()}`);
+                this.debug(`Subtract ${b} - ${a} = ${this._stack.top()}`);
                 break;
             }
             case DUP:
-                if (this.debug) console.log(`Duplicate top value '${this._stack.top()}'`);
+                this.debug(`Duplicate top value '${this._stack.top()}'`);
                 this.pushStack(this._stack.top()); // Duplicate top value on stack
                 break;
             case COND: {
@@ -79,12 +78,12 @@ export class LengthInterpreter extends BaseInterpreter {
                     this.line++;
                     if (this._lines[this.line].length === GOTOU || this._lines[this.line].length === PUSH) {
                         this.line++; // Skip gotou or push instruction TWICE to skip the arguments
-                        if (this.debug) console.log(`Condition: ${x}: skip *2`);
+                        this.debug(`Condition: ${x}: skip *2`);
                     } else {
-                        if (this.debug) console.log(`Condition: ${x}: skip *1`);
+                        this.debug(`Condition: ${x}: skip *1`);
                     }
                 } else {
-                    if (this.debug) console.log(`Condition: ${x}: no skip`);
+                    this.debug(`Condition: ${x}: no skip`);
                 }
                 break;
             }
@@ -92,29 +91,29 @@ export class LengthInterpreter extends BaseInterpreter {
                 if (this.line + 1 >= this._lines.length) throw new Error(`GOTOU: expected one argument`);
                 const value = this._lines[this.line + 1].length;
                 this.line = value - 1; // incremented at end
-                if (this.debug) console.log(`GOTOU: Goto position ${value} (index ${value - 1})`);
+                this.debug(`GOTOU: Goto position ${value} (index ${value - 1})`);
                 break;
             }
             case OUTN:
                 if (this._stack.size() < 1) throw new Error(`OUTN: Stack underflow`);
-                if (this.debug) console.log(`Print as number: '${this._stack.top()}'`);
+                this.debug(`Print as number: '${this._stack.top()}'`);
                 this._callbackOutput(str(num(this.popStack()))); // Output top value as a number
                 break;
             case OUTA:
                 if (this._stack.size() < 1) throw new Error(`OUTA: Stack underflow`);
-                if (this.debug) console.log(`Print as ASCII: '${String.fromCharCode(this._stack.top())}'`);
+                this.debug(`Print as ASCII: '${String.fromCharCode(this._stack.top())}'`);
                 this._callbackOutput(str(String.fromCharCode(+this.popStack()))); // Output top value as an ASCII character
                 break;
             case ROL:
                 if (this._stack.size() < 1) break;
-                if (this.debug) console.log(`Rotate stack left`);
+                this.debug(`Rotate stack left`);
                 arrayRotateLeft(this._stack._);
                 this._callbackUpdateStack("update", this._stack.toArray());
                 break;
             case SWAP: {
                 if (this._stack.size() < 2) throw new Error(`SWAP: Stack underflow`);
                 let a = num(this.popStack()), b = num(this.popStack());
-                if (this.debug) console.log(`Swap values ${a} and ${b}`);
+                this.debug(`Swap values ${a} and ${b}`);
                 this.pushStack(a); // Swap top two values on the stack
                 this.pushStack(b);
                 break;
@@ -123,34 +122,34 @@ export class LengthInterpreter extends BaseInterpreter {
                 if (this._stack.size() < 2) throw new Error(`MUL: Stack underflow`);
                 let a = num(this.popStack()), b = num(this.popStack());
                 this.pushStack(a * b);
-                if (this.debug) console.log(`Multiply: ${a} * ${b} = ${this._stack.top()}`);
+                this.debug(`Multiply: ${a} * ${b} = ${this._stack.top()}`);
                 break;
             }
             case DIV: {
                 if (this._stack.size() < 2) throw new Error(`DIV: Stack underflow`);
                 let a = num(this.popStack()), b = num(this.popStack());
                 this.pushStack(b / a);
-                if (this.debug) console.log(`Divide: ${b} / ${a} = ${this._stack.top()}`);
+                this.debug(`Divide: ${b} / ${a} = ${this._stack.top()}`);
                 break;
             }
             case POP:
                 if (this._stack.size() < 1) throw new Error(`POP: Stack underflow`);
-                if (this.debug) console.log(`Pop value: '${this._stack.top()}'`);
+                this.debug(`Pop value: '${this._stack.top()}'`);
                 this.popStack();
                 break;
             case GOTOS: {
                 if (this._stack.size() < 1) throw new Error(`GOTOS: Stack underflow`);
                 this.line = Math.abs(parseInt(this.popStack())) - 1; // incremented at end
-                if (this.debug) console.log(`GOTO Stack: Goto position ${this.line + 1}`);
+                this.debug(`GOTO Stack: Goto position ${this.line + 1}`);
                 break;
             }
             case PUSH:
                 this.pushStack(this._lines[++this.line].length);
-                if (this.debug) console.log(`Push value '${this._stack.top()}'`);
+                this.debug(`Push value '${this._stack.top()}'`);
                 break;
             case ROR:
                 if (this._stack.size() < 1) break;
-                if (this.debug) console.log(`ROL: Rotate stack right`);
+                this.debug(`ROL: Rotate stack right`);
                 arrayRotateRight(this._stack._);
                 this._callbackUpdateStack("update", this._stack.toArray());
                 break;

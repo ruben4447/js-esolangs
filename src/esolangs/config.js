@@ -1,20 +1,52 @@
 import { popupTextarea } from './../app.js';
 
 // == THESE BUTTON OBJECTS ARE USED A LOT, SO DEFINE AS CONSTANTS FOR REUSE AND
-const btnReset = { reset: {
-    text: 'Reset',
-    fn: (obj) => ({ code: obj.getCode() }),
-}};
-const btnInterpret = { interpret: {
-    text: 'Interpret',
-    fn: (obj) => ({ code: obj.getCode() }),
-}};
-const btnStep = { step: {
-    text: 'Step',
-    fn: () => ({}),
-}};
+const btnReset = {
+    reset: {
+        text: 'Reset',
+        fn: (obj) => ({ code: obj.getCode() }),
+    }
+};
+const btnInterpret = {
+    interpret: {
+        text: 'Interpret',
+        fn: (obj) => ({ code: obj.getCode() }),
+    }
+};
+const btnStep = {
+    step: {
+        text: 'Step',
+        fn: () => ({}),
+    }
+};
 
 export const langOptions = {
+    beatnik: {
+        wiki: 'https://esolangs.org/wiki/Beatnik',
+        gui: { vars: 'object', stack: 'stack' },
+        opts: {
+            debug: true,
+        },
+        buttons: {
+            ...btnReset,
+            ...btnInterpret,
+            ...btnStep,
+        },
+    },
+    befunge: {
+        wiki: 'https://esolangs.org/wiki/Befunge',
+        gui: { pointers: 'object', stack: 'stack' },
+        opts: {
+            debug: false,
+            wrapLimit: 1000, // Set to 0 to disallow wrapping
+            selfModification: true,
+        },
+        buttons: {
+            ...btnReset,
+            ...btnInterpret,
+            ...btnStep,
+        },
+    },
     brainfuck: {
         wiki: 'https://esolangs.org/wiki/Brainfuck',
         gui: { pointers: 'object', dataReel: 'dataReel' },
@@ -78,20 +110,6 @@ export const langOptions = {
                     return { code };
                 },
             },
-            ...btnInterpret,
-            ...btnStep,
-        },
-    },
-    befunge: {
-        wiki: 'https://esolangs.org/wiki/Befunge',
-        gui: { pointers: 'object', stack: 'stack' },
-        opts: {
-            debug: false,
-            wrapLimit: 1000, // Set to 0 to disallow wrapping
-            selfModification: true,
-        },
-        buttons: {
-            ...btnReset,
             ...btnInterpret,
             ...btnStep,
         },

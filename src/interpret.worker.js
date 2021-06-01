@@ -3,6 +3,7 @@ import ElementInterpreter from "./esolangs/Element/Interpreter.js";
 import LengthInterpreter from "./esolangs/Length/Interpreter.js";
 import BefungeInterpreter from "./esolangs/Befunge/Interpreter.js";
 import SlashesInterpreter from "./esolangs/Slashes/Interpreter.js";
+import BeatnikInterpreter from "./esolangs/Beatnik/Interpreter.js";
 import { num } from "./utils.js";
 
 var interpreter; // Code interpreter
@@ -68,6 +69,13 @@ function createInterpreter(lang, opts) {
         i = new SlashesInterpreter();
         if (opts.updateVisuals) {
             i._callbackChangeData = (key, value) => self.postMessage({ cmd: 'updateObject', name: 'data', action: 'set', key, value, });
+
+        }
+    } else if (lang === 'beatnik') {
+        i = new BeatnikInterpreter();
+        if (opts.updateVisuals) {
+            i._callbackUpdatePtr = ptr => self.postMessage({ cmd: 'updateObject', action: 'set', name: 'vars', key: 'ptr', value: ptr })
+            i._callbackUpdateStack = (type, value) => self.postMessage({ cmd: 'updateStack', type, value });
         }
     } else {
         throw new TypeError(`Unknown language '${lang}'`);
@@ -89,8 +97,8 @@ function createInterpreter(lang, opts) {
         };
     }
     if (opts.updateVisuals && i._callbackUpdateCode) i._callbackUpdateCode = () => self.postMessage({ cmd: 'setCode', code: i.getCode() });
-    if (i.debug !== undefined) i.debug = opts.debug === true;
-    postMessage("Created interpreter for " + lang);
+    i._debug = opts.debug === true;
+    postMessage("Created interpreter for " + i.LANG);
 
     // Load code if there is any in the cache
     if (codeCache !== undefined) {
