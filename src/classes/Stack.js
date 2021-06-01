@@ -1,5 +1,6 @@
 import { num } from "../utils.js";
 
+/** Simple stack implementation */
 export class Stack {
     constructor() {
         this._ = [];
@@ -38,6 +39,19 @@ export class Stack {
      * @returns {any}
      */
     pop() { return this._.pop(); }
+
+    /**
+     * Get item at any index
+     * @param {number} index
+    */
+    get(index) { return this._[index]; }
+
+    /**
+     * Set item at any index
+     * @param {number} index
+     * @param {any} value
+    */
+    set(index, value) { this._[index] = value; }
 
     toArray() { return [...this._]; }
 }

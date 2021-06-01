@@ -21,11 +21,27 @@ const btnStep = {
 };
 
 export const langOptions = {
+    airlineFood: {
+        name: 'Airline Food',
+        wiki: 'https://esolangs.org/wiki/Airline_food',
+        gui: { pointers: 'object', stack: 'stack', lookup: 'object' },
+        opts: {
+            debug: false,
+            errorNearLength: 20,
+            outputNumbers: false,
+        },
+        buttons: {
+            ...btnReset,
+            ...btnInterpret,
+            ...btnStep,
+        },
+    },
     beatnik: {
+        name: 'Beatnik',
         wiki: 'https://esolangs.org/wiki/Beatnik',
         gui: { vars: 'object', stack: 'stack' },
         opts: {
-            debug: true,
+            debug: false,
         },
         buttons: {
             ...btnReset,
@@ -34,6 +50,7 @@ export const langOptions = {
         },
     },
     befunge: {
+        name: 'Begfunge',
         wiki: 'https://esolangs.org/wiki/Befunge',
         gui: { pointers: 'object', stack: 'stack' },
         opts: {
@@ -48,6 +65,7 @@ export const langOptions = {
         },
     },
     brainfuck: {
+        name: 'Brainfuck',
         wiki: 'https://esolangs.org/wiki/Brainfuck',
         gui: { pointers: 'object', dataReel: 'dataReel' },
         opts: {
@@ -72,6 +90,7 @@ export const langOptions = {
         },
     },
     element: {
+        name: 'Element',
         wiki: 'https://esolangs.org/wiki/Element',
         gui: { pointers: 'object', mainStack: 'stack', controlStack: 'stack', vars: 'object' },
         opts: {
@@ -84,6 +103,7 @@ export const langOptions = {
         }
     },
     length: {
+        name: 'Length',
         wiki: 'https://esolangs.org/wiki/Length',
         gui: { pointers: 'object', stack: 'stack' },
         opts: {
@@ -115,6 +135,7 @@ export const langOptions = {
         },
     },
     slashes: {
+        name: 'Slashes',
         wiki: 'https://esolangs.org/wiki////',
         gui: { data: 'object' },
         opts: {

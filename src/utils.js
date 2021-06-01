@@ -6,6 +6,10 @@ export const regexLetter = /[A-Za-z]/;
 export const regexNumber = /[0-9]/;
 export const regexWhitespace = /\s/;
 
+export function underlineStringPortion(string, startPos, length = 1, prefix = "", underlineChar = "~") {
+    return prefix + string + '\n' + (' '.repeat(startPos + prefix.length)) + (underlineChar[0].repeat(length));;
+}
+
 export function createFieldset(parent, legend) {
     const fieldset = document.createElement("fieldset");
     fieldset.innerHTML += `<legend>${legend}</legend>`;
@@ -169,7 +173,7 @@ self.str = str;
  * @return {Promise<string>}
  */
 export async function readFileAsText(file) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         let reader = new FileReader();
         reader.onload = () => {
             resolve(reader.result);
@@ -205,12 +209,13 @@ export function generateCountedString(length) {
     return str;
 }
 
-/** Replace {pattern} with {replacement} {n} times */
-export function stringReplace(string, pattern, replacement, n = 1) {
-    for (let k = 0; k < n; k++) {
-        let i = string.indexOf(pattern);
-        if (i === -1) break;
-        string = strReplaceAt(string, i, replacement);
+/** Extract from text until a stop character is reached. Return null if stop char is never reached */
+export function extractUntil(string, stopChar) {
+    let i = 0;
+    while (true) {
+        if (i === string.length) return null;
+        if (string[i] === stopChar) break;
+        i++;
     }
-    return string;
+    return string.substring(0, i);
 }

@@ -18,7 +18,7 @@ function _main() {
     p.appendChild(select);
     select.insertAdjacentHTML('beforeend', `<option value=''>- Select One -</option>`);
     for (const name of Object.keys(langOptions)) {
-        select.insertAdjacentHTML('beforeend', `<option value='${name}'>${name.replace(/\_/g, ' ')}</option>`);
+        select.insertAdjacentHTML('beforeend', `<option value='${name}'>${langOptions[name].name}</option>`);
     }
     select.addEventListener('change', () => {
         if (select.value.length !== 0) selectEsolang(select.value);
@@ -91,11 +91,12 @@ function _main() {
     });
 }
 
-var CODE = `Hello, aunts! Around, around, swim!`;
-
 window.addEventListener('load', async () => {
     await _main();
 
-    selectEsolang("beatnik", true, false);
-    if (CODE.length !== 0) userControl.setCode(CODE);
+    // selectEsolang("airlineFood", true, false);
+    // userControl.setCode(`What's the deal with airplane food? Moving on... So... What's the deal with vegans? Moving on...`);
 });
+
+import { skipWord } from "./esolangs/Airline-food/utils.js";
+self.fn = skipWord;

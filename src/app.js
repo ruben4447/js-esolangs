@@ -19,7 +19,7 @@ export const elStatus = document.createElement("code");
 export function createInterpreterWorker() {
     if (interpreterWorker === undefined) {
         interpreterWorker = new Worker('src/interpret.worker.js', { type: 'module' }); // Worker which will manage esolang code execution
-        interpreterWorker.onerror = function(event){
+        interpreterWorker.onerror = function (event) {
             console.error("ERROR IN WORKER:\n", event);
         };
         interpreterWorker.onmessage = event => {
@@ -112,7 +112,7 @@ export function createInterpreterWorker() {
                             components[name].pop();
                         } else if (data.type === "empty") {
                             components[name].dump();
-                        }  else if (data.type === 'update') {
+                        } else if (data.type === 'update') {
                             components[name]._stack._ = data.value;
                             components[name].updateAll();
                         } else throw new Error(`cmd:'updateStack' -> unknown update type '${data.type}'`);
@@ -161,7 +161,10 @@ export function killInterpreterWorker() {
 export function selectEsolang(lang, updateVisuals = true, allowConfig = true) {
     if (langOptions[lang] === undefined) throw new Error(`Language "${lang}" is not supported`);
     // Tell worker to setup esolang. Worker will sent back a response
-    const initEsolang = () => interpreterWorker.postMessage({ cmd: 'setEsolang', lang, opts: optObject });
+    const initEsolang = () => {
+        document.title = `Esolangs - ${langOptions[lang].name}`;
+        interpreterWorker.postMessage({ cmd: 'setEsolang', lang, opts: optObject });
+    };
 
     // Remove all components
     for (let name in components) {
@@ -189,14 +192,14 @@ export function selectEsolang(lang, updateVisuals = true, allowConfig = true) {
                     checkbox.addEventListener('change', () => optObject[opt] = checkbox.checked);
                     div.appendChild(checkbox);
                 } else if (typeof optObject[opt] === 'number') {
-                    let input  = document.createElement("input");
+                    let input = document.createElement("input");
                     input.type = "number";
                     input.min = "0";
                     input.value = optObject[opt].toString();
                     input.addEventListener('change', () => optObject[opt] = +input.value);
                     div.appendChild(input);
                 } else {
-                    let input  = document.createElement("input");
+                    let input = document.createElement("input");
                     input.type = "text";
                     input.value = optObject[opt].toString();
                     input.addEventListener('change', () => optObject[opt] = input.value);
@@ -210,7 +213,7 @@ export function selectEsolang(lang, updateVisuals = true, allowConfig = true) {
             popup.hide();
             initEsolang();
         });
-        
+
         popup.show();
     } else {
         initEsolang();

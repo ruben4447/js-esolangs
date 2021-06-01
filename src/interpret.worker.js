@@ -4,6 +4,7 @@ import LengthInterpreter from "./esolangs/Length/Interpreter.js";
 import BefungeInterpreter from "./esolangs/Befunge/Interpreter.js";
 import SlashesInterpreter from "./esolangs/Slashes/Interpreter.js";
 import BeatnikInterpreter from "./esolangs/Beatnik/Interpreter.js";
+import AirlineFoodInterpreter from "./esolangs/Airline-food/Interpreter.js";
 import { num } from "./utils.js";
 
 var interpreter; // Code interpreter
@@ -74,7 +75,15 @@ function createInterpreter(lang, opts) {
     } else if (lang === 'beatnik') {
         i = new BeatnikInterpreter();
         if (opts.updateVisuals) {
-            i._callbackUpdatePtr = ptr => self.postMessage({ cmd: 'updateObject', action: 'set', name: 'vars', key: 'ptr', value: ptr })
+            i._callbackUpdatePtr = ptr => self.postMessage({ cmd: 'updateObject', action: 'set', name: 'vars', key: 'ptr', value: ptr });
+            i._callbackUpdateStack = (type, value) => self.postMessage({ cmd: 'updateStack', type, value });
+        }
+    } else if (lang === 'airlineFood') {
+        i = new AirlineFoodInterpreter();
+        i.errorNearLength = num(opts.errorNearLength);
+        i.outputNumbers = opts.outputNumbers === true;
+        if (opts.updateVisuals) {
+            i._callbackUpdateObject = (name, action, key, value) => self.postMessage({ cmd: 'updateObject', action, name, key, value });
             i._callbackUpdateStack = (type, value) => self.postMessage({ cmd: 'updateStack', type, value });
         }
     } else {
@@ -130,10 +139,10 @@ globalThis.onmessage = async (event) => {
             switch (data.btn) {
                 case 'reset':
                     interpreter.reset();
-                    postMessage({ cmd: 'print', msg: `> interpreter reset --lang ${interpreter.LANG}\n` });
+                    postMessage({ cmd: 'print', msg: `> interpreter reset --lang "${interpreter.LANG}"\n` });
                     break;
                 case 'minify': {
-                    postMessage({ cmd: 'print', msg: `> interpreter minify --lang ${interpreter.LANG} --file ./userInput\n` });
+                    postMessage({ cmd: 'print', msg: `> interpreter minify --lang "${interpreter.LANG}" --file ./userInput\n` });
                     if (typeof interpreter.minifyCode === 'function') {
                         let code = interpreter.minifyCode(data.args.code);
                         postMessage({ cmd: 'minifiedCode', code, });
@@ -189,6 +198,7 @@ function loadCode(code) {
         try {
             interpreter.setCode(code);
         } catch (e) {
+            console.error(e);
             const error = new Error(`Error whilst loading ${interpreter.LANG} code:\n${e}`);
             postMessage({ cmd: 'error', error });
         }
@@ -201,9 +211,8 @@ function loadCode(code) {
 async function interpret(code) {
     if (interpreting) throw new Error(`Worker is already busy interpreting!`);
     interpreting = true;
-    postMessage({ cmd: 'print', msg: `\n> interpreter execute --lang ${interpreter.LANG} --file ./userInput\n` });
+    postMessage({ cmd: 'print', msg: `\n> interpreter execute --lang "${interpreter.LANG}" --file ./userInput\n` });
     pushStatus(`Interpreting ${interpreter.LANG}`);
-    if (typeof code === 'string') loadCode(code);
     let error, timeStart = Date.now();
     try {
         await interpreter.interpret(code);
