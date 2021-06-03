@@ -195,7 +195,6 @@ export class FalseInterpreter extends BaseInterpreter {
 
     let skip = 0;
     while (this._call[ti][this.ptr + skip].match(regexWhitespace)) skip++; // Consume Whitespace
-    console.log(skip)
     if (skip !== 0) this.ptr += skip; // Skip past whitespace
     const ptr = this.ptr, char = this._call[ti][ptr];
 

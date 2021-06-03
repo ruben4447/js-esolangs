@@ -156,6 +156,15 @@ export class BeatnikInterpreter extends BaseInterpreter {
         this.ptr++;
         return true;
     }
+
+    async interpret(code) {
+        try {
+            super.interpret(code);
+        } catch (e) {
+            console.error(e);
+            throw new Error(`Error at position ${this.ptr}:\n${e}`);
+        }
+    }
 }
 
 export default BeatnikInterpreter;

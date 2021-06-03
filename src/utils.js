@@ -225,6 +225,10 @@ export function padLines(lines, pad = ' ') {
 export const randomInt = (min, max) => Math.floor(Math.random() * (max - min)) + min;
 export const randomChoice = array => array[randomInt(0, array.length)];
 
+export function strInsertAt(string, index, toInsert) {
+    return string.substr(0, index) + toInsert + string.substr(index);
+}
+
 export function strReplaceAt(string, index, replacement) {
     return string.substr(0, index) + replacement + string.substr(index + replacement.length);
 }

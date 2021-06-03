@@ -107,7 +107,7 @@ export const langOptions = {
         wiki: 'https://esolangs.org/wiki/FALSE',
         gui: { callStack: 'stack', stack: 'stack', vars: 'object' },
         opts: {
-            debug: !false,
+            debug: false,
             numbersAsInts: true,
             multicharVarNames: true,
         },
@@ -157,6 +157,19 @@ export const langOptions = {
             debug: false,
         },
         buttons: {
+            ...btnInterpret,
+            ...btnStep,
+        },
+    },
+    underload: {
+        name: 'Underload',
+        wiki: 'https://esolangs.org/wiki/Underload',
+        gui: { data: 'object', stack: 'stack' },
+        opts: {
+            debug: true,
+        },
+        buttons: {
+            ...btnReset,
             ...btnInterpret,
             ...btnStep,
         },

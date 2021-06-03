@@ -96,5 +96,8 @@ function _main() {
 window.addEventListener('load', async () => {
     await _main();
 
-    // selectEsolang("false", true, false);
+    selectEsolang("underload", true, false);
+    userControl.setCode(`(:*)::::****:*(
+)!((:(1)*(:(2)*(:(3)*(:(4)*(:(5)*(:(6)*(:(7)*(:(8)*(:(9)*(!~:^))))))))))(
+)!:(~^~(~a~*~a~*)~a*^:(0)*)~a*~:(a(:^)*())~*a(:^)*~()~(0)~(~!^))~*^^!S!!!`);
 });

@@ -228,6 +228,7 @@ export class AirlineFoodInterpreter extends BaseInterpreter {
         } catch (e) {
             console.error(e);
             let len = this.errorNearLength, near = this._code.substr(this.ip, len), { line, col } = this.getLineCol();
+            near = underlineStringPortion(near, this.ip);
             let divider = '-'.repeat(35);
             let main = `Error at position ${this.ip} (line ${line + 1}, col ${col + 1})\n`;
             if (this._matchedText.length !== 0) main += `  Whilst processing instruction "${this._matchedText}"\n`;

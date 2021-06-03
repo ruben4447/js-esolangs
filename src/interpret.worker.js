@@ -7,6 +7,7 @@ import BeatnikInterpreter from "./esolangs/Beatnik/Interpreter.js";
 import AirlineFoodInterpreter from "./esolangs/Airline-food/Interpreter.js";
 import FalseInterpreter from "./esolangs/FALSE/Interpreter.js";
 import { num } from "./utils.js";
+import UnderloadInterpreter from "./esolangs/Underload/Interpreter.js";
 
 var interpreter; // Code interpreter
 var activeBlocker; // Blocker object. May be resolve by cmd:'unblock'
@@ -135,6 +136,14 @@ function createInterpreter(lang, opts) {
             if (opts.updateVisuals) {
                 i._callbackUpdatePtr = ptr => self.postMessage({ cmd: 'updateObject', action: 'set', name: 'vars', key: 'ptr', value: ptr });
                 i._callbackUpdateStack = (type, value) => self.postMessage({ cmd: 'updateStack', type, value });
+            }
+            break;
+        }
+        case "underload": {
+            i = new UnderloadInterpreter();
+            if (opts.updateVisuals) {
+                i._callbackUpdateStack = (type, value) => self.postMessage({ cmd: 'updateStack', type, value });
+                i._callbackUpdatePtr = (value) => self.postMessage({ cmd: 'updateObject', name: 'data', action: 'set', key: 'ptr', value });
             }
             break;
         }
