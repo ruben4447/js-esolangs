@@ -107,7 +107,7 @@ export const langOptions = {
         wiki: 'https://esolangs.org/wiki/FALSE',
         gui: { callStack: 'stack', stack: 'stack', vars: 'object' },
         opts: {
-            debug: false,
+            debug: !false,
             numbersAsInts: true,
             multicharVarNames: true,
         },

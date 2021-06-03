@@ -96,9 +96,5 @@ function _main() {
 window.addEventListener('load', async () => {
     await _main();
 
-    selectEsolang("false", true, false);
-    userControl.setCode(`10a:[a;0>a;0=|][a;.a;0>[", "]?a;1-a:]#`);
+    // selectEsolang("false", true, false);
 });
-
-import * as utils from './esolangs/FALSE/utils.js';
-self.u = utils;

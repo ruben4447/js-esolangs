@@ -5,9 +5,25 @@ import { HTMLObject } from './classes/HTMLObject.js';
 export const regexLetter = /[A-Za-z]/;
 export const regexNumber = /[0-9]/;
 export const regexWhitespace = /\s/;
+export const regexNewline = /\r\n|\r|\n/;
 
 export function underlineStringPortion(string, startPos, length = 1, prefix = "", underlineChar = "~") {
-    return prefix + string + '\n' + (' '.repeat(startPos + prefix.length)) + (underlineChar[0].repeat(length));
+    if (regexNewline.test(string)) {
+        let output = '', lines = string.split(regexNewline);
+        console.log(lines);
+        for (let l = 0, i = 0; l < lines.length; l++, i++) { // i++ for newline character
+            output += l === 0 ? prefix : ' '.repeat(prefix.length);
+            output += lines[l];
+            if (startPos >= i && startPos <= i + lines[l].length) {
+                output += '\n' + ' '.repeat(prefix.length + (startPos - i)) + (underlineChar[0].repeat(length));
+            }
+            i += lines[l].length;
+            if (l < lines.length - 1) output += '\n';
+        }
+        return output;
+    } else {
+        return prefix + string + '\n' + (' '.repeat(startPos + prefix.length)) + (underlineChar[0].repeat(length));
+    }
 }
 
 /** Highlight string portion - use <mark> tags */
@@ -244,4 +260,16 @@ export function createEnum(obj) {
         }
     }
     return enumObj;
+}
+
+export function linearPosToLineCol(string, index) {
+    let line = 0, col = 0;
+    for (let i = 0; i < index; i++) {
+        col++;
+        if (regexNewline.test(string[i])) {
+            line++;
+            col = 0;
+        }
+    }
+    return { line, col };
 }

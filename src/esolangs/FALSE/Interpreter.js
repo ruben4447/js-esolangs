@@ -1,7 +1,7 @@
 import BaseInterpreter from "../BaseInterpreter.js";
 import Blocker from "../../classes/Blocker.js";
-import { createEnum, underlineStringPortion, regexNumber, atop, regexWhitespace, scanNumber, num, scanString, getMatchingBracket, highlightStringPortion, escapeHtml, regexLetter } from "../../utils.js";
-import { scanComment, constructBracketMap } from "./utils.js";
+import { linearPosToLineCol, createEnum, underlineStringPortion, regexNumber, atop, regexWhitespace, scanNumber, num, scanString, getMatchingBracket, highlightStringPortion, escapeHtml, regexLetter } from "../../utils.js";
+import { scanComment } from "./utils.js";
 
 export class FalseInterpreter extends BaseInterpreter {
   constructor() {
@@ -95,7 +95,8 @@ export class FalseInterpreter extends BaseInterpreter {
   generateTraceback() {
     let arr = [];
     for (let i = this._call.length - 1; i >= 0; i--) {
-      let prefix = `in FN(${i}) :  `;
+      let { line, col } = linearPosToLineCol(this._call[i], this._ptrs[i]);
+      let prefix = `at ${this._ptrs[i]} ${line + 1}:${col + 1} '${this._call[i][this._ptrs[i]]}' :  `;
       let str = underlineStringPortion(this._call[i], this._ptrs[i], 1, prefix);
       arr.push(str);
     }
@@ -194,6 +195,7 @@ export class FalseInterpreter extends BaseInterpreter {
 
     let skip = 0;
     while (this._call[ti][this.ptr + skip].match(regexWhitespace)) skip++; // Consume Whitespace
+    console.log(skip)
     if (skip !== 0) this.ptr += skip; // Skip past whitespace
     const ptr = this.ptr, char = this._call[ti][ptr];
 
@@ -450,6 +452,7 @@ export class FalseInterpreter extends BaseInterpreter {
         // == VARIABLE RETRIEVAL ==
         case ';': {
           const varName = this.popStack(TYPE.String).value;
+          console.log(`${this.ptr}, \`${char}\`, \`${this._call[ti][this.ptr]}\``)
           if (this._vars[varName] === undefined) throw new Error(`Variable name '${varName}' cannot be resolved.`);
           this.pushStack(this._vars[varName].value, this._vars[varName].type);
           this.debug(`VARIABLE: Retrieve variable '${varName}' -> "${this._vars[varName].value}" (${this._vars[varName].type})`);
@@ -491,7 +494,8 @@ export class FalseInterpreter extends BaseInterpreter {
     } catch (e) {
       console.error(e);
       const traces = this.generateTraceback();
-      throw new Error(`FATAL ERROR IN FALSE PROGRAM - FUNCTION DEPTH ${this._call.length}: \n${e}\n\n ===== CALL STACK =====\n${traces.join('\n')}`);
+      const { line, col } = linearPosToLineCol(atop(this._call), atop(this._ptrs));
+      throw new Error(`Fatal error in function ${this._call.length} at '${atop(this._call)[atop(this._ptrs)]}' : \n${e}\n\n ===== CALL STACK =====\n${traces.join('\n')}`);
     }
   }
 }
@@ -503,6 +507,5 @@ const TYPE = createEnum({
   Function: 4,
   VarRef: 8,
 });
-const TRUE = -1, FALSE = 0;
 
 export default FalseInterpreter;
