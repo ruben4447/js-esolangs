@@ -89,14 +89,16 @@ function _main() {
     userControl.onButtonPress((btn, args, obj) => {
         interpreterWorker.postMessage({ cmd: 'btnPress', btn, args });
     });
+
+    globalThis.ioconsole = ioconsole;
 }
 
 window.addEventListener('load', async () => {
     await _main();
 
-    // selectEsolang("airlineFood", true, false);
-    // userControl.setCode(`What's the deal with airplane food? Moving on... So... What's the deal with vegans? Moving on...`);
+    selectEsolang("false", true, false);
+    userControl.setCode(`10a:[a;0>a;0=|][a;.a;0>[", "]?a;1-a:]#`);
 });
 
-import { skipWord } from "./esolangs/Airline-food/utils.js";
-self.fn = skipWord;
+import * as utils from './esolangs/FALSE/utils.js';
+self.u = utils;

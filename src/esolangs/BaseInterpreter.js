@@ -7,6 +7,7 @@ export class BaseInterpreter {
     constructor() {
         this._code = "";
         this._debug = false;
+        this._updateVisuals = false;
     }
 
     /** Get language name */
@@ -21,6 +22,9 @@ export class BaseInterpreter {
     /** Debug message */
     debug(...args) {
         if (this._debug) console.log(...args);
+    }
+    debugWarn(...args) {
+        if (this._debug) console.warn(...args);
     }
 
     /** MUST BE OVERRIDEN */

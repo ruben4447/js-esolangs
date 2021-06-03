@@ -107,7 +107,7 @@ export function createInterpreterWorker() {
                         const name = data.stack === undefined ? 'stack' : `${data.stack}Stack`;
                         if (components[name] === undefined) throw new Error(`cmd:'updateStack' where stack='${data.stack}' -> cannot find component '${name}'`);
                         if (data.type === "push") {
-                            components[name].push(data.value);
+                            components[name].push(data.value, data.title);
                         } else if (data.type === "pop") {
                             components[name].pop();
                         } else if (data.type === "empty") {
@@ -137,6 +137,9 @@ export function createInterpreterWorker() {
                         new Popup(data.title).setContent(textarea).show();
                         break;
                     }
+                    case 'flush':
+                        ioconsole.flush();
+                        break;
                     default:
                         console.log(data);
                         throw new Error(`Message from Worker: unknown event command '${data.cmd}'`);
@@ -159,7 +162,12 @@ export function killInterpreterWorker() {
 }
 
 export function selectEsolang(lang, updateVisuals = true, allowConfig = true) {
-    if (langOptions[lang] === undefined) throw new Error(`Language "${lang}" is not supported`);
+    if (langOptions[lang] === undefined) {
+        let emsg = `Language "${lang}" is not supported`;
+        ioconsole.error("\n" + emsg);
+        throw new Error(emsg);
+    }
+
     // Tell worker to setup esolang. Worker will sent back a response
     const initEsolang = () => {
         document.title = `Esolangs - ${langOptions[lang].name}`;

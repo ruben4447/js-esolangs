@@ -7,7 +7,17 @@ export const regexNumber = /[0-9]/;
 export const regexWhitespace = /\s/;
 
 export function underlineStringPortion(string, startPos, length = 1, prefix = "", underlineChar = "~") {
-    return prefix + string + '\n' + (' '.repeat(startPos + prefix.length)) + (underlineChar[0].repeat(length));;
+    return prefix + string + '\n' + (' '.repeat(startPos + prefix.length)) + (underlineChar[0].repeat(length));
+}
+
+/** Highlight string portion - use <mark> tags */
+export function highlightStringPortion(string, startPos, length = 1) {
+    return string.substring(0, startPos) + "<mark>" + string.substr(startPos, length) + "</mark>" + string.substr(startPos + length);
+}
+
+/** Sanitise text for HTML insertion */
+export function escapeHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;").replaceAll(' ', '&nbsp;');
 }
 
 export function createFieldset(parent, legend) {
@@ -56,13 +66,14 @@ export function getMatchingBracket(pos, program) {
     throw new Error("No matching bracket found for '" + program[pos] + "' in position " + pos);
 }
 
-/** Get input character from KeyboardEvent */
+/** Get input character from KeyboardEvent. Return string, or undefined */
 export function getChar(e) {
     if (e.key.length === 1) return e.key;
     if (e.key === 'Space') return ' ';
     if (e.key === 'Enter') return '\n';
     if (e.key === 'Tab') return '\t';
-    return '';
+    if (e.key === 'Escape') return '';
+    return undefined;
 }
 
 /** Create object from type e.g. 'dataReel' */
@@ -79,10 +90,10 @@ export function createObjectFromType(type, wrapper) {
 /**
  * Scan and extract string from string
  * @param {string} string 
- * @param {string[]} breakChars Chars to break string scanning on. May be overrided by preceding with a backslash
+ * @param {string[]} breakChars Chars to break string scanning on. May be overrided by preceding with a backslash. Default is ['"']
  * @return {{ str: string, length: number }}
  */
-export function scanString(string, breakChars = []) {
+export function scanString(string, breakChars = ['"']) {
     let str = '', precedingBackslash = false, length = 0;
     for (const char of string) {
         if (char === '\\' && !precedingBackslash) {
@@ -147,6 +158,9 @@ export function arrayRotateLeft(array) {
 export function arrayRotateRight(array) {
     array.unshift(array.pop());
 }
+
+/** Get top value of array */
+export const atop = arr => arr[arr.length - 1];
 
 /** Convert object to number */
 export function num(x) {
@@ -218,4 +232,16 @@ export function extractUntil(string, stopChar) {
         i++;
     }
     return string.substring(0, i);
+}
+
+/** For each key, create a key withs its value */
+export function createEnum(obj) {
+    const enumObj = {};
+    for (let key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            enumObj[key] = obj[key];
+            enumObj[obj[key]] = key;
+        }
+    }
+    return enumObj;
 }

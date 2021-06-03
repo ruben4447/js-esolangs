@@ -63,6 +63,7 @@ export class HTMLStack {
     constructor(wrapper) {
         this._wrapper = wrapper;
         this._stack = new Stack();
+        this._titles = new Stack();
         this.doUpdate = true;
 
         this._table = undefined;
@@ -71,16 +72,17 @@ export class HTMLStack {
         this.updateAll();
     }
 
-    push(value) { this._stack.push(value); this.updatePush(); }
+    push(value, title) { this._stack.push(value); this._titles.push(title); this.updatePush(); }
     pop() { this._stack.pop(); this.updatePop(); }
-    dump() { this._stack.dump(); this.updateAll(); }
+    dump() { this._stack.dump(); this._titles.dump(); this.updateAll(); }
 
     /** Update HTML of push'd item */
-    updatePush() {
-        let td = document.createElement('td'), value = this._stack.top();
+    updatePush(i) {
+        if (i === undefined) i = this._stack.size() - 1;
+        let td = document.createElement('td'), value = this._stack.get(i);
         td.classList.add('raw-data');
-        td.innerText = value;
-        td.title = num(value).toString();
+        td.innerHTML = value;
+        td.title = this._titles.get(i) === undefined ? `(num)` + num(value) : this._titles.get(i);
         this._els.push(td);
         this._tr.appendChild(td);
         this.updateSize();
@@ -89,6 +91,7 @@ export class HTMLStack {
     /** Update HTML of pop'd item */
     updatePop() {
         let el = this._els.pop();
+        this._titles.pop();
         if (el) {
             this._tr.removeChild(el);
             this.updateSize();
@@ -119,12 +122,7 @@ export class HTMLStack {
 
             let size = this._stack.size();
             for (let i = 0; i < size; i++) {
-                const tdValue = document.createElement('td');
-                tdValue.classList.add("raw-data");
-                tdValue.innerText = this._stack._[i];
-                trValue.appendChild(tdValue);
-                tdValue.title = `(${typeof this._stack._[i]})`;
-                this._els[i] = tdValue;
+                this.updatePush(i);
             }
 
             this._wrapper.appendChild(table);

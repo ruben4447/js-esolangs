@@ -10,29 +10,14 @@
     overflow: scroll;
 }
 
-.ioconsole-line {
+.ioconsole {
     color: var(--console-white);
     font-family: Consolas;
     font-size: .8em;
     white-space: pre;
 }
 
-.ioconsole-line[data-type="response"],
-.ioconsole-line[data-type="notice"] {
-    opacity: 0.8;
-    font-style: italic;
-}
-
-.ioconsole-line[data-type="error"] {
-    font-style: bolder;
-    color: tomato;
-}
-.ioconsole-line[data-type="system"] {
-    font-style: italic;
-    color: lightgrey;
-}
-
-.ioconsole-line>input {
+.ioconsole>input {
     border: none;
     outline: none;
     caret-color: var(--console-white);

@@ -102,6 +102,21 @@ export const langOptions = {
             ...btnStep,
         }
     },
+    false: {
+        name: 'FALSE',
+        wiki: 'https://esolangs.org/wiki/FALSE',
+        gui: { callStack: 'stack', stack: 'stack', vars: 'object' },
+        opts: {
+            debug: false,
+            numbersAsInts: true,
+            multicharVarNames: true,
+        },
+        buttons: {
+            ...btnReset,
+            ...btnStep,
+            ...btnInterpret,
+        },
+    },
     length: {
         name: 'Length',
         wiki: 'https://esolangs.org/wiki/Length',
