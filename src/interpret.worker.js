@@ -15,7 +15,6 @@ var activeBlocker; // Blocker object. May be resolve by cmd:'unblock'
 var interpreting = false;
 const statusStack = [];
 var codeCache; // Store code from 'loadCode' event
-var outputBuffer = ''; // Store output before it is sent to STDOUT
 var gDelay = 0; // Delay for interpreting
 
 function pushStatus(status) {
@@ -32,14 +31,13 @@ function popStatus() {
 }
 
 /** Store message in output buffer */
-function print(str) {
-    outputBuffer += str;
+function print(msg) {
+    self.postMessage({ cmd: 'print', msg });
 }
 
 /** Send error message */
 function emitError(e) {
-    flush();
-    postMessage({ cmd: 'error', error: e });
+    self.postMessage({ cmd: 'error', error: e });
 }
 
 function setDelay(delay) {
@@ -48,16 +46,6 @@ function setDelay(delay) {
     gDelay = delay;
     if (interpreter) interpreter._execDelay = delay;
 }
-
-/** Send output buffer to STDOUT */
-function flush() {
-    if (outputBuffer.length !== 0) {
-        self.postMessage({ cmd: 'print', msg: outputBuffer });
-        outputBuffer = '';
-    }
-    self.requestAnimationFrame(flush);
-}
-self.requestAnimationFrame(flush);
 
 /** Create esolang interpreter  */
 function createInterpreter(lang, opts) {
@@ -108,10 +96,7 @@ function createInterpreter(lang, opts) {
                 i._callbackUpdateStack = (name, type, value, title) => self.postMessage({ cmd: 'updateStack', stack: name, type, value, title });
                 i._callbackUpdateObject = (name, action, key, value) => self.postMessage({ cmd: 'updateObject', action, name, key, value });
             }
-            i._callbackFlush = () => {
-                flush(); // Flush the Workers output buffer
-                self.postMessage({ cmd: 'flush' }); // Flush the clients output buffer
-            };
+            i._callbackFlush = () => self.postMessage({ cmd: 'flush' }); // Flush the clients output buffer
             break;
         }
         case "fish": {
@@ -192,6 +177,10 @@ function createInterpreter(lang, opts) {
         };
     }
     if (opts.updateVisuals && i._callbackUpdateCode) i._callbackUpdateCode = () => self.postMessage({ cmd: 'setCode', code: i.getCode() });
+
+    /** UpdateCodeGrid. Code is updated automatically in _callbackUpdateCode */
+    if (opts.updateVisuals && i._callbackUpdateGrid) i._callbackUpdateGrid = (code, positions, format = "string") => self.postMessage({ cmd: 'updateCodeGrid', code, format, positions });
+
     i._debug = opts.debug === true;
     i._execDelay = gDelay;
     postMessage("Created interpreter for " + i.LANG);

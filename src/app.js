@@ -48,7 +48,7 @@ export function createInterpreterWorker() {
                         break;
                     case 'setCode':
                         // Set code in userControl
-                        userControl.setCode(data.code, false);
+                        setCode(data.code);
                         break;
                     case 'interpreterResponse':
                         let str = `Execution terminated with exit code ${data.ok ? 0 : 1} (${data.time} ms)`;
@@ -139,6 +139,22 @@ export function createInterpreterWorker() {
                     }
                     case 'flush':
                         ioconsole.flush();
+                        break;
+                    case 'updateCodeGrid':
+                        if (components.grid == undefined) throw new Error(`Recieved command "${data.cmd}", but no grid to update`);
+                        if (data.code !== undefined) { // Code
+                            if (data.format === 'array') {
+                                components.grid.setCodeArray(data.code);
+                            } else {
+                                components.grid.setCode(data.code, false);
+                            }
+                        }
+                        if (data.positions !== undefined) { // Positions to highlight
+                            data.positions.forEach(p => {
+                                components.grid.highlight(...p);
+                            });
+                            components.grid.updateHighlighted();
+                        }
                         break;
                     default:
                         console.log(data);
@@ -242,6 +258,11 @@ export function prepareEsolangGUI(lang, updateVisuals) {
             if (!updateVisuals) fieldset.style.display = "none";
         }
     }
+}
+
+export function setCode(code) {
+    userControl.setCode(code, false); // DO NOT send another request to the worker - infinite loop!
+    if (components.grid) components.grid.setCode(code, true);
 }
 
 /** Create popup with textarea, and wait for user to press buttons before resolving Promise. */

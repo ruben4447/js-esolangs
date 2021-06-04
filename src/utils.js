@@ -1,6 +1,7 @@
 import DataReel from './classes/DataReel.js';
 import { HTMLStack } from './classes/Stack.js';
 import { HTMLObject } from './classes/HTMLObject.js';
+import CodeGrid from './classes/CodeGrid.js';
 
 export const regexLetter = /[A-Za-z]/;
 export const regexNumber = /[0-9]/;
@@ -106,6 +107,7 @@ export function createObjectFromType(type, wrapper) {
         case 'dataReel': return new DataReel(wrapper);
         case 'stack': return new HTMLStack(wrapper);
         case 'object': return new HTMLObject(wrapper);
+        case 'codeGrid': return new CodeGrid(wrapper);
         default:
             throw new TypeError(`Unknown object type '${type}'`);
     }

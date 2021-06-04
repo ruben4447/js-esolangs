@@ -47,7 +47,7 @@ export const langOptions = {
         name: 'Beatnik',
         dir: 'Beatnik',
         wiki: 'https://esolangs.org/wiki/Beatnik',
-        gui: { vars: 'object', stack: 'stack' },
+        gui: { vars: 'object', stack: 'stack', grid: 'codeGrid' },
         opts: {
             debug: false,
         },
@@ -61,7 +61,7 @@ export const langOptions = {
         name: 'Befunge',
         dir: 'Befunge',
         wiki: 'https://esolangs.org/wiki/Befunge',
-        gui: { pointers: 'object', stack: 'stack' },
+        gui: { pointers: 'object', stack: 'stack', grid: 'codeGrid' },
         opts: {
             debug: false,
             wrapLimit: 1000, // Set to 0 to disallow wrapping
@@ -77,7 +77,7 @@ export const langOptions = {
         name: 'Brainfuck',
         dir: 'Brainfuck',
         wiki: 'https://esolangs.org/wiki/Brainfuck',
-        gui: { pointers: 'object', dataReel: 'dataReel' },
+        gui: { pointers: 'object', dataReel: 'dataReel', grid: 'codeGrid' },
         opts: {
             numType: "uint8",
             reelLength: 10,
@@ -103,7 +103,7 @@ export const langOptions = {
         name: 'Element',
         dir: 'Element',
         wiki: 'https://esolangs.org/wiki/Element',
-        gui: { pointers: 'object', mainStack: 'stack', controlStack: 'stack', vars: 'object' },
+        gui: { pointers: 'object', mainStack: 'stack', controlStack: 'stack', vars: 'object', grid: 'codeGrid' },
         opts: {
             autovivification: true, // Create variable if it doesn't exist (if true), or error (if false)  [regarding instruction '~']
         },
@@ -120,7 +120,7 @@ export const langOptions = {
         gui: { callStack: 'stack', stack: 'stack', vars: 'object' },
         opts: {
             debug: false,
-            numbersAsInts: false,
+            numbersAsInts: true,
             multicharVarNames: true,
             allowRotateCmd: true,
         },
@@ -134,9 +134,9 @@ export const langOptions = {
         name: 'Fish',
         dir: 'Fish',
         wiki: 'https://esolangs.org/wiki/Fish',
-        gui: { data: 'object', stack: 'stack', registerStack: 'stack' },
+        gui: { data: 'object', stack: 'stack', registerStack: 'stack', grid: 'codeGrid' },
         opts: {
-            debug: true,
+            debug: false,
             wrapLimit: 50,
             detailedErrors: true,
             skipStrings: false,
@@ -199,7 +199,7 @@ export const langOptions = {
         name: 'Underload',
         dir: 'Underload',
         wiki: 'https://esolangs.org/wiki/Underload',
-        gui: { data: 'object', stack: 'stack' },
+        gui: { data: 'object', stack: 'stack', grid: 'codeGrid' },
         opts: {
             debug: true,
         },

@@ -1,5 +1,5 @@
-import { main, elStatus, createInterpreterWorker, killInterpreterWorker, selectEsolang, interpreterWorker, editConsoleUI, esolang, promptForInputPopup } from './app.js';
-import { createFieldset, readFileAsText } from './utils.js';
+import { main, elStatus, createInterpreterWorker, killInterpreterWorker, selectEsolang, interpreterWorker, editConsoleUI, esolang, promptForInputPopup, setCode } from './app.js';
+import { createFieldset, randomInt, readFileAsText, sleep } from './utils.js';
 import { langOptions } from './esolangs/config.js';
 import UserControl from "./classes/UserControl.js";
 import IOConsole from "./classes/Console.js";
@@ -110,6 +110,4 @@ function _main() {
 
 window.addEventListener('load', async () => {
     await _main();
-
-    selectEsolang("false", true, false);
 });

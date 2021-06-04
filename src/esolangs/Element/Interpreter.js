@@ -18,7 +18,9 @@ export class ElementInterpreter extends BaseInterpreter {
         this._callbackOutput = () => { };
         this._callbackInput = () => { };
         /** @type {(pos: number) => void} */
-        this._callbackUpdatePos = pos => { };
+        this._callbackUpdatePos = () => { };
+        /** @type {(code: string, positions: number[][], format: string) => void} */
+        this._callbackUpdateGrid = () => { };
 
         this._bracketMap = {}; // Map opening positions to closing positions, and vica versa
         this._loopCounts = {}; // Maps opening positions in code of loops to number of cycles left
@@ -35,6 +37,7 @@ export class ElementInterpreter extends BaseInterpreter {
         } catch (e) {
             throw new Error(`Found unmatched bracket:\n${e}`);
         }
+        this._callbackUpdateGrid(this._code, undefined);
     }
 
     reset() {
@@ -289,12 +292,13 @@ export class ElementInterpreter extends BaseInterpreter {
             }
             this.pos++; // Increment position (skip char)
         }
+        this._callbackUpdateGrid(undefined, [[this.pos, 0]]);
         return true;
     }
 
     async interpret() {
         try {
-            super.interpret();
+            await super.interpret();
         } catch (e) {
             console.error(e);
             throw new Error(`Element: error at position ${this.pos} at '${this._code[this.pos]}':\n ${e}`);

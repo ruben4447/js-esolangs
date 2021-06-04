@@ -2,11 +2,12 @@ import BaseInterpreter from "../BaseInterpreter.js";
 import { scrabble } from "./utils.js";
 import { Stack } from "../../classes/Stack.js";
 import Blocker from "../../classes/Blocker.js";
-import { num, ord, str } from "../../utils.js";
+import { num, ord, str, regexNewline } from "../../utils.js";
 
 export class BeatnikInterpreter extends BaseInterpreter {
     constructor() {
         super();
+        this._lines = [];
         this._words = [];
         this._stack = new Stack();
         this._ptr = 0;
@@ -16,6 +17,8 @@ export class BeatnikInterpreter extends BaseInterpreter {
         this._callbackUpdateStack = (type, value) => { };
         this._callbackGetch = () => { };
         this._callbackOutput = () => { };
+        /** @type {(code: string, positions: number[][], format: string) => void} */
+        this._callbackUpdateGrid = () => { };
     }
 
     get LANG() { return "beatnik"; }
@@ -26,7 +29,10 @@ export class BeatnikInterpreter extends BaseInterpreter {
     setCode(code) {
         code = code.replace(/[^A-Za-z\s]/g, '');
         super.setCode(code);
-        this._words = code.split(/\s+/g).filter(x => x.length !== 0);
+        this._lines = this._code.split(regexNewline);
+        this._words = this._code.split(/\s+/g).filter(x => x.length !== 0);
+        let scrabbledWords = this._code.split(regexNewline).map(line => line.split(/\s+/g).map(word => scrabble(word)));
+        this._callbackUpdateGrid(scrabbledWords, undefined, "array");
     }
 
     reset() {
@@ -40,6 +46,16 @@ export class BeatnikInterpreter extends BaseInterpreter {
         if (this._stack.empty()) throw new Error(`Stack Underflow while popping`);
         this._callbackUpdateStack("pop");
         return this._stack.pop();
+    }
+
+    getWordLineCol() {
+        let words = this._lines.map(line => line.split(/\s+/g));
+        for (let i = 0, k = 0; i < words.length; i++) {
+            for (let j = 0; j < words[i].length; j++, k++) {
+                if (this.ptr === k) return [j, i]; // (x, y)
+            }
+        }
+        return undefined;
     }
 
     async step() {
@@ -154,12 +170,15 @@ export class BeatnikInterpreter extends BaseInterpreter {
                 this.debug(`NO-OP: '${this._words[this.ptr]}' ${score}`);
         }
         this.ptr++;
+
+        let pos = this.getWordLineCol();
+        if (pos !== undefined) this._callbackUpdateGrid(undefined, [pos]);
         return true;
     }
 
     async interpret() {
         try {
-            super.interpret();
+            await super.interpret();
         } catch (e) {
             console.error(e);
             throw new Error(`Error at position ${this.ptr}:\n${e}`);

@@ -28,6 +28,8 @@ export class BrainfuckInterpreter extends BaseInterpreter {
         this._callbackSetAllData = array => { }; // Reset this._data
         this._callbackOutput = () => { }; // Output character
         this._callbackGetch = () => { }; // Callback for user input. Takes Blocker object
+        /** @type {(code: string, positions: number[][], format: string) => void} */
+        this._callbackUpdateGrid = () => { };
     }
 
     get LANG() { return 'brainfuck'; }
@@ -54,7 +56,10 @@ export class BrainfuckInterpreter extends BaseInterpreter {
         this._callbackSetAllData(this._data);
     }
 
-    setCode(code) { this._code = this.minifyCode(code); }
+    setCode(code) {
+        super.setCode(this.minifyCode(code));
+        this._callbackUpdateGrid(this._code, undefined);
+    }
 
     /** Minify program */
     minifyCode(code) {
@@ -102,6 +107,7 @@ export class BrainfuckInterpreter extends BaseInterpreter {
                 break;
         }
         this.ip++;
+        this._callbackUpdateGrid(undefined, [[this.ip, 0]]);
         return true;
     }
 }

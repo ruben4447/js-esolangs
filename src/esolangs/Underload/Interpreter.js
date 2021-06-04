@@ -14,6 +14,8 @@ export class UnderloadInterpreter extends BaseInterpreter {
     this._callbackUpdateCode = () => { };
     this._callbackUpdatePtr = () => { };
     this._callbackOutput = () => { };
+    /** @type {(code: string, positions: number[][], format: string) => void} */
+    this._callbackUpdateGrid = () => { };
   }
 
   get LANG() { return "Underload"; }
@@ -21,7 +23,12 @@ export class UnderloadInterpreter extends BaseInterpreter {
   get ptr() { return this._ptr; }
   set ptr(value) { this._ptr = value; this._callbackUpdatePtr(this._ptr); }
 
-  setCode(code) { super.setCode(code); this._originalCode = this._code; }
+  setCode(code) {
+    super.setCode(code);
+    this._originalCode = this._code;
+    this._callbackUpdateGrid(this._code);
+  }
+
   reset() {
     this._stack.dump();
     this._callbackUpdateStack("empty");
@@ -88,6 +95,7 @@ export class UnderloadInterpreter extends BaseInterpreter {
     }
 
     this.ptr++;
+    this._callbackUpdateGrid(undefined, [[this.ptr, 0]]);
     return true;
   }
 

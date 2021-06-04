@@ -27,6 +27,8 @@ export class BefungeInterpreter extends BaseInterpreter {
         this._callbackGetch = () => { };
         /** @type {(x: number, y: number, chr: string) => void} */
         this._callbackUpdateCode = () => { };
+        /** @type {(code: string, positions: number[][], format: string) => void} */
+        this._callbackUpdateGrid = () => { };
     }
 
     get LANG() { return "befunge"; }
@@ -59,6 +61,7 @@ export class BefungeInterpreter extends BaseInterpreter {
         this.wrapCount = 0;
         this._stack.dump();
         this._callbackUpdateStack("empty");
+        this._callbackUpdateGrid(undefined, [[this.x, this.y]]);
     }
 
     /** @overload */
@@ -66,6 +69,7 @@ export class BefungeInterpreter extends BaseInterpreter {
         this._code = code;
         this._lines = code.split(/\r\n|\r|\n/g);
         padLines(this._lines, ' '); // Make every line the same length
+        this._callbackUpdateGrid(this._code);
     }
     /** @overload */
     getCode() { return this._lines.join('\n'); }
@@ -107,7 +111,7 @@ export class BefungeInterpreter extends BaseInterpreter {
         }
     }
 
-    async step() {
+    async _step() {
         const oldWrapCount = this.wrapCount;
         if (this.y < 0) {
             this.y = this._lines.length - 1;
@@ -264,6 +268,12 @@ export class BefungeInterpreter extends BaseInterpreter {
 
             return true;
         }
+    }
+
+    async step() {
+        let v = await this._step();
+        this._callbackUpdateGrid(undefined, [[this.x, this.y]]);
+        return v;
     }
 
     async interpret() {

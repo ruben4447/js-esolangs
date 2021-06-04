@@ -31,6 +31,8 @@ export class FishInterpreter extends BaseInterpreter {
     this._callbackGetch = () => { };
     this._callbackInput = () => { };
     this._callbackUpdateCode = () => { };
+    /** @type {(code: string, positions: number[][], format: string) => void} */
+    this._callbackUpdateGrid = () => { };
   }
 
   get LANG() { return "Fish"; }
@@ -54,6 +56,7 @@ export class FishInterpreter extends BaseInterpreter {
     this._lines = this._code.split(/\r\n|\r|\n/g);
     padLines(this._lines, ' '); // Make every line the same length
     this.reset(false);
+    this._callbackUpdateGrid(this._lines.join('\n'));
   }
   getCode() { return this._lines.join('\n'); }
   /** Update stack GUI */
@@ -144,7 +147,8 @@ export class FishInterpreter extends BaseInterpreter {
     this._callbackUpdateStack("register", "pop");
     this._callbackUpdateStack("register", "push", value);
   }
-  async step() {
+
+  async _step() {
     const oldWrapCount = this.wrapCount;
     this.wrapPosition();
 
@@ -426,6 +430,12 @@ export class FishInterpreter extends BaseInterpreter {
     }
 
     return true;
+  }
+
+  async step() {
+    let v = await this._step();
+    this._callbackUpdateGrid(undefined, [[this.x, this.y]]);
+    return v;
   }
 
   async interpret() {
