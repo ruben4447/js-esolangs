@@ -269,10 +269,15 @@ export async function popupTextarea(title, text = undefined, btnText = 'Go') {
     });
 }
 
-export async function pushValueToStackPopup(allowString = true, allowNumber = true, allowBoolean = true) {
+export async function promptForInputPopup(title, text = undefined, allowString = true, allowNumber = true, allowBoolean = true, defaultValue = undefined) {
     return new Promise((resolve, reject) => {
-        const popup = new Popup("Push Value to Stack");
-        let p, value;
+        const popup = new Popup(title);
+        let p, value = defaultValue;
+        if (text !== undefined) {
+            p = document.createElement("p");
+            p.innerText = text;
+            popup.insertAdjacentElement('beforeend', p);
+        }
 
         if (allowString) {
             p = document.createElement("p");
@@ -281,6 +286,7 @@ export async function pushValueToStackPopup(allowString = true, allowNumber = tr
             let input = document.createElement("input");
             input.type = "text";
             input.addEventListener('change', () => value = input.value);
+            if (typeof defaultValue === 'string') input.value = defaultValue;
             p.appendChild(input);
         }
         if (allowNumber) {
@@ -290,6 +296,7 @@ export async function pushValueToStackPopup(allowString = true, allowNumber = tr
             let input = document.createElement("input");
             input.type = "number";
             input.addEventListener('change', () => value = +input.value);
+            if (typeof defaultValue === 'number') input.value = defaultValue;
             p.appendChild(input);
         }
         if (allowBoolean) {
@@ -308,6 +315,10 @@ export async function pushValueToStackPopup(allowString = true, allowNumber = tr
             radioFalse.addEventListener('change', () => value = false);
             p.appendChild(radioFalse);
             p.insertAdjacentHTML('beforeend', ' False');
+            if (typeof defaultValue === 'boolean') {
+                if (defaultValue) radioTrue.checked = true;
+                else radioFalse.checked = false;
+            }
         }
 
         let btn = document.createElement("button");

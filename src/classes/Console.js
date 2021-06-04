@@ -1,4 +1,4 @@
-import { getChar } from "../utils.js";
+import { getChar, scrollToBottom } from "../utils.js";
 
 /**
  * Console
@@ -177,6 +177,7 @@ export class IOConsole {
       }
       this._.appendChild(el);
     });
+    scrollToBottom(this._);
   }
 }
 
@@ -184,7 +185,3 @@ IOConsole.defaultFg = "#e9e7e7";
 IOConsole.defaultBg = "#222121";
 
 export default IOConsole;
-
-const scrollToBottom = (node) => {
-  node.scrollTop = node.scrollHeight;
-};

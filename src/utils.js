@@ -7,6 +7,8 @@ export const regexNumber = /[0-9]/;
 export const regexWhitespace = /\s/;
 export const regexNewline = /\r\n|\r|\n/;
 
+export const scrollToBottom = node => node.scrollTop = node.scrollHeight;
+
 export function underlineStringPortion(string, startPos, length = 1, prefix = "", underlineChar = "~") {
     if (regexNewline.test(string)) {
         let output = '', lines = string.split(regexNewline);
@@ -41,6 +43,12 @@ export function createFieldset(parent, legend) {
     fieldset.innerHTML += `<legend>${legend}</legend>`;
     parent.appendChild(fieldset);
     return fieldset;
+}
+
+export function sleep(ms) {
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, ms);
+    });
 }
 
 export const bracketMap = {

@@ -368,6 +368,23 @@ export class FalseInterpreter extends BaseInterpreter {
           break;
         }
 
+        // == ROTATE ==
+        case '®': {
+          if (this.allowRotateCmd) {
+            const pos = this.popStack(TYPE.Number); // Position to get thing from
+            const index = this._stack.length - pos.value; // Index in stack
+            if (index < 0 || index >= this._stack.length) throw new Error(`Rotate N (®): position ${pos.value} (index ${index}) is out of stack bounds!`);
+            if (index > 1) {
+              const item = this._stack.splice(index, 1)[0];
+              this._stack.push(item);
+              this.debug(`ROTATE N: Rotate item in position ${pos.value} (index ${index}) to top position -> "${item.value}" (${item.type})`);
+              this._callbackUpdateStack(undefined, "update", this._stack.map(obj => obj.value));
+            }
+            this.ptr++;
+          } else throw new Error(`Custom rotate command is not enabled`);
+          break;
+        }
+
         // == INPUT CHAR (getch) ==
         case '^': {
           const blocker = new Blocker();
@@ -450,7 +467,6 @@ export class FalseInterpreter extends BaseInterpreter {
         // == VARIABLE RETRIEVAL ==
         case ';': {
           const varName = this.popStack(TYPE.String).value;
-          console.log(`${this.ptr}, \`${char}\`, \`${this._call[ti][this.ptr]}\``)
           if (this._vars[varName] === undefined) throw new Error(`Variable name '${varName}' cannot be resolved.`);
           this.pushStack(this._vars[varName].value, this._vars[varName].type);
           this.debug(`VARIABLE: Retrieve variable '${varName}' -> "${this._vars[varName].value}" (${this._vars[varName].type})`);

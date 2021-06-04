@@ -1,3 +1,5 @@
+import { sleep } from "../utils.js";
+
 /**
  * Base class for a language interpreter
  * Add basic functionality that, unless extra is requires, is generally dufficient for said methods
@@ -8,6 +10,7 @@ export class BaseInterpreter {
         this._code = "";
         this._debug = false;
         this._updateVisuals = false;
+        this._execDelay = 0;
     }
 
     /** Get language name */
@@ -35,6 +38,7 @@ export class BaseInterpreter {
         let cont;
         do {
             cont = await this.step();
+            if (this._execDelay !== 0) await sleep(this._execDelay);
         } while (cont);
     }
 }

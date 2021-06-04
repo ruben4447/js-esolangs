@@ -16,6 +16,7 @@ var interpreting = false;
 const statusStack = [];
 var codeCache; // Store code from 'loadCode' event
 var outputBuffer = ''; // Store output before it is sent to STDOUT
+var gDelay = 0; // Delay for interpreting
 
 function pushStatus(status) {
     statusStack.push(status);
@@ -39,6 +40,13 @@ function print(str) {
 function emitError(e) {
     flush();
     postMessage({ cmd: 'error', error: e });
+}
+
+function setDelay(delay) {
+    delay = num(delay);
+    if (delay < 0) delay = 0;
+    gDelay = delay;
+    if (interpreter) interpreter._execDelay = delay;
 }
 
 /** Send output buffer to STDOUT */
@@ -95,6 +103,7 @@ function createInterpreter(lang, opts) {
             i = new FalseInterpreter();
             i.numbersAsInts = opts.numbersAsInts === true;
             i.multicharVarNames = opts.multicharVarNames === true;
+            i.allowRotateCmd = opts.allowRotateCmd === true;
             if (opts.updateVisuals) {
                 i._callbackUpdateStack = (name, type, value, title) => self.postMessage({ cmd: 'updateStack', stack: name, type, value, title });
                 i._callbackUpdateObject = (name, action, key, value) => self.postMessage({ cmd: 'updateObject', action, name, key, value });
@@ -184,6 +193,7 @@ function createInterpreter(lang, opts) {
     }
     if (opts.updateVisuals && i._callbackUpdateCode) i._callbackUpdateCode = () => self.postMessage({ cmd: 'setCode', code: i.getCode() });
     i._debug = opts.debug === true;
+    i._execDelay = gDelay;
     postMessage("Created interpreter for " + i.LANG);
 
     // Load code if there is any in the cache
@@ -211,6 +221,8 @@ globalThis.onmessage = async (event) => {
             }
         } else if (data.cmd === 'loadCode') {
             loadCode(data.code);
+        } else if (data.cmd === 'setDelay') {
+            setDelay(data.delay);
         } else if (data.cmd === 'btnPress') {
             // Press button in CodeInput
             switch (data.btn) {

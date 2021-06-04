@@ -1,4 +1,4 @@
-import { popupTextarea, pushValueToStackPopup } from './../app.js';
+import { popupTextarea, promptForInputPopup } from './../app.js';
 
 // == THESE BUTTON OBJECTS ARE USED A LOT, SO DEFINE AS CONSTANTS FOR REUSE AND
 const btnReset = {
@@ -19,10 +19,17 @@ const btnStep = {
         fn: () => ({}),
     }
 };
+const btnPushStack = {
+    pushStack: {
+        text: 'Push to Stack',
+        fn: async () => ({ value: await promptForInputPopup('Push Value to Stack', undefined, false, true, false) }),
+    },
+};
 
 export const langOptions = {
     airlineFood: {
         name: 'Airline Food',
+        dir: 'Airline-Food',
         wiki: 'https://esolangs.org/wiki/Airline_food',
         gui: { pointers: 'object', stack: 'stack', lookup: 'object' },
         opts: {
@@ -38,6 +45,7 @@ export const langOptions = {
     },
     beatnik: {
         name: 'Beatnik',
+        dir: 'Beatnik',
         wiki: 'https://esolangs.org/wiki/Beatnik',
         gui: { vars: 'object', stack: 'stack' },
         opts: {
@@ -51,6 +59,7 @@ export const langOptions = {
     },
     befunge: {
         name: 'Befunge',
+        dir: 'Befunge',
         wiki: 'https://esolangs.org/wiki/Befunge',
         gui: { pointers: 'object', stack: 'stack' },
         opts: {
@@ -66,6 +75,7 @@ export const langOptions = {
     },
     brainfuck: {
         name: 'Brainfuck',
+        dir: 'Brainfuck',
         wiki: 'https://esolangs.org/wiki/Brainfuck',
         gui: { pointers: 'object', dataReel: 'dataReel' },
         opts: {
@@ -91,6 +101,7 @@ export const langOptions = {
     },
     element: {
         name: 'Element',
+        dir: 'Element',
         wiki: 'https://esolangs.org/wiki/Element',
         gui: { pointers: 'object', mainStack: 'stack', controlStack: 'stack', vars: 'object' },
         opts: {
@@ -104,12 +115,14 @@ export const langOptions = {
     },
     false: {
         name: 'FALSE',
+        dir: 'FALSE',
         wiki: 'https://esolangs.org/wiki/FALSE',
         gui: { callStack: 'stack', stack: 'stack', vars: 'object' },
         opts: {
             debug: false,
-            numbersAsInts: true,
+            numbersAsInts: false,
             multicharVarNames: true,
+            allowRotateCmd: true,
         },
         buttons: {
             ...btnReset,
@@ -119,6 +132,7 @@ export const langOptions = {
     },
     fish: {
         name: 'Fish',
+        dir: 'Fish',
         wiki: 'https://esolangs.org/wiki/Fish',
         gui: { data: 'object', stack: 'stack', registerStack: 'stack' },
         opts: {
@@ -130,16 +144,14 @@ export const langOptions = {
         },
         buttons: {
             ...btnReset,
-            pushStack: {
-                text: 'Push to Stack',
-                fn: async () => ({ value: await pushValueToStackPopup(false, true, false) }),
-            },
+            ...btnPushStack,
             ...btnInterpret,
             ...btnStep,
         },
     },
     length: {
         name: 'Length',
+        dir: 'Length',
         wiki: 'https://esolangs.org/wiki/Length',
         gui: { pointers: 'object', stack: 'stack' },
         opts: {
@@ -172,6 +184,7 @@ export const langOptions = {
     },
     slashes: {
         name: 'Slashes',
+        dir: 'Slashes',
         wiki: 'https://esolangs.org/wiki////',
         gui: { data: 'object' },
         opts: {
@@ -184,6 +197,7 @@ export const langOptions = {
     },
     underload: {
         name: 'Underload',
+        dir: 'Underload',
         wiki: 'https://esolangs.org/wiki/Underload',
         gui: { data: 'object', stack: 'stack' },
         opts: {

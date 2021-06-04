@@ -1,0 +1,1 @@
+0a:1b:6"First "$." terms of Fibonacci: "0[$2ø>~][a;.b;a;+b:b;a;-a:1+$2ø>~[", "]?]#

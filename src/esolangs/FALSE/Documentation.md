@@ -32,7 +32,8 @@ Anything surrounded by `{}` is a comment. Comments cannot be nested.
 - `%` : pop topmost item from stack
 - `\` : swap items on stack (`[ a b c ]` -> `[ a c b ]`)
 - `@` : rotate third stack item to top (`[ a b c ] -> [ b c a ]`)
-- `ø` : pop value `a`. Copy item in position `a` in the stack to the top (*N.B.* position is from the end). e.g. `1 2 3 4 5 1ø.` -> `4`
+- `ø` : pop value `a`. Copy item in position `a` in the stack to the top (*N.B.* position is from the end starting at **0**). e.g. `1 2 3 4 5 1ø.` -> `4`
+- `®` : pop a value `a`. Rotate (move) item at position `a` in the stack to the top (*N.B.* unlike `ø`, position is from the end starting at **1**). This is a custom command (adotped from http://morphett.info/false/false.html) to address a shortcoming of the original design.
 
 ## I/O
 - `^` : retrieve single character input from STDIN (`getch()`). Push ACII char code, or `-1` if `EOF` (to simulate `EOF`, press `esc` when pronmpted for GETCH)
