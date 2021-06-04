@@ -31,8 +31,7 @@ export class BaseInterpreter {
     async step() { throw new Error(`${this.constructor.name} : async step: requires overloading`); }
 
     /** Interpret code. May be overwritten e.g. for error handling */
-    async interpret(code) {
-        if (code !== undefined) this.setCode(code);
+    async interpret() {
         let cont;
         do {
             cont = await this.step();

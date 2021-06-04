@@ -2,7 +2,7 @@ import BaseInterpreter from "../BaseInterpreter.js";
 import { scrabble } from "./utils.js";
 import { Stack } from "../../classes/Stack.js";
 import Blocker from "../../classes/Blocker.js";
-import { num, str } from "../../utils.js";
+import { num, ord, str } from "../../utils.js";
 
 export class BeatnikInterpreter extends BaseInterpreter {
     constructor() {
@@ -70,7 +70,7 @@ export class BeatnikInterpreter extends BaseInterpreter {
                 const blocker = new Blocker();
                 this._callbackGetch(blocker);
                 let chr = await blocker.block(); // Wait for character
-                this.pushStack(num(chr.charCodeAt(0)));
+                this.pushStack(ord(chr));
                 break;
             }
             case 9: {
@@ -157,9 +157,9 @@ export class BeatnikInterpreter extends BaseInterpreter {
         return true;
     }
 
-    async interpret(code) {
+    async interpret() {
         try {
-            super.interpret(code);
+            super.interpret();
         } catch (e) {
             console.error(e);
             throw new Error(`Error at position ${this.ptr}:\n${e}`);

@@ -230,8 +230,8 @@ export class BefungeInterpreter extends BaseInterpreter {
                 // Get character from user, push ASCII code
                 const blocker = new Blocker();
                 this._callbackGetch(blocker); // Request getch (callback will call blocker.unblock(<value>))
-                const input = await blocker.block(); // Wait for input
-                this.pushStack(num(str(input).charCodeAt(0)));
+                const char = await blocker.block(); // Wait for input
+                this.pushStack(chr(char));
             } else if (this.selfModification && c === 'g') {
                 // throw new Error(`IMPLEMENTATION ERROR: operator 'g' is not implemented`);
                 let y = num(this.popStack()), x = num(this.popStack()), n;
@@ -266,10 +266,9 @@ export class BefungeInterpreter extends BaseInterpreter {
         }
     }
 
-    /** @overload */
-    async interpret(code) {
+    async interpret() {
         try {
-            await super.interpret(code);
+            await super.interpret();
         } catch (e) {
             console.error(e); // Log original
             throw new Error(`Befunge: error at position (${this.mx},${this.my}) '${this.get()}':\n ${e}`);

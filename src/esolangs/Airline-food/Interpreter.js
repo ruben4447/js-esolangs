@@ -222,9 +222,9 @@ export class AirlineFoodInterpreter extends BaseInterpreter {
         return true;
     }
 
-    async interpret(code) {
+    async interpret() {
         try {
-            await super.interpret(code);
+            await super.interpret();
         } catch (e) {
             console.error(e);
             let len = this.errorNearLength, near = this._code.substr(this.ip, len), { line, col } = this.getLineCol();

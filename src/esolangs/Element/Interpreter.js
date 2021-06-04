@@ -292,9 +292,9 @@ export class ElementInterpreter extends BaseInterpreter {
         return true;
     }
 
-    async interpret(code) {
+    async interpret() {
         try {
-            super.interpret(code);
+            super.interpret();
         } catch (e) {
             console.error(e);
             throw new Error(`Element: error at position ${this.pos} at '${this._code[this.pos]}':\n ${e}`);

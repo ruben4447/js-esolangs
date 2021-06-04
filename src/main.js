@@ -86,7 +86,7 @@ function _main() {
 
     // == Callbacks ==
     userControl.onChange(code => interpreterWorker.postMessage({ cmd: 'loadCode', code, }));
-    userControl.onButtonPress((btn, args, obj) => {
+    userControl.onButtonPress((btn, args) => {
         interpreterWorker.postMessage({ cmd: 'btnPress', btn, args });
     });
 
@@ -96,8 +96,7 @@ function _main() {
 window.addEventListener('load', async () => {
     await _main();
 
-    selectEsolang("underload", true, false);
-    userControl.setCode(`(:*)::::****:*(
-)!((:(1)*(:(2)*(:(3)*(:(4)*(:(5)*(:(6)*(:(7)*(:(8)*(:(9)*(!~:^))))))))))(
-)!:(~^~(~a~*~a~*)~a*^:(0)*)~a*~:(a(:^)*())~*a(:^)*~()~(0)~(~!^))~*^^!S!!!`);
+    selectEsolang("fish", true, false);
+    userControl.setCode(`1[:>:r:@@:@,\\;
+]~$\\!?={:,2+/n`);
 });

@@ -91,9 +91,9 @@ export class UnderloadInterpreter extends BaseInterpreter {
     return true;
   }
 
-  async interpret(code) {
+  async interpret() {
     try {
-      await super.interpret(code);
+      await super.interpret();
     } catch (e) {
       console.error(e);
       let start = this.ptr - 5, snippet = this._code.substr(start < 0 ? 0 : start, 10);

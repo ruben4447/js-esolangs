@@ -1,6 +1,6 @@
 import BaseInterpreter from "../BaseInterpreter.js";
 import Blocker from "../../classes/Blocker.js";
-import { linearPosToLineCol, createEnum, underlineStringPortion, regexNumber, atop, regexWhitespace, scanNumber, num, scanString, getMatchingBracket, highlightStringPortion, escapeHtml, regexLetter } from "../../utils.js";
+import { linearPosToLineCol, createEnum, underlineStringPortion, regexNumber, atop, regexWhitespace, scanNumber, num, scanString, getMatchingBracket, highlightStringPortion, escapeHtml, regexLetter, ord } from "../../utils.js";
 import { scanComment } from "./utils.js";
 
 export class FalseInterpreter extends BaseInterpreter {
@@ -372,8 +372,7 @@ export class FalseInterpreter extends BaseInterpreter {
         case '^': {
           const blocker = new Blocker();
           this._callbackGetch(blocker);
-          const char = await blocker.block(), // Wait for input
-            charCode = char.length === 0 ? -1 : num(char.charCodeAt(0));
+          const char = await blocker.block(), charCode = ord(char);
           this.pushStack(charCode, TYPE.Number);
           this.debug(`INPUT: getch'd "${char}" code ${charCode}`);
           this.ptr++;
@@ -487,9 +486,9 @@ export class FalseInterpreter extends BaseInterpreter {
     return true;
   }
 
-  async interpret(code) {
+  async interpret() {
     try {
-      await super.interpret(code);
+      await super.interpret();
     } catch (e) {
       console.error(e);
       const traces = this.generateTraceback();

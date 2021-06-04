@@ -1,7 +1,7 @@
 import BaseInterpreter from "../BaseInterpreter.js";
 import { Stack } from "../../classes/Stack.js";
 import { Blocker } from "../../classes/Blocker.js";
-import { arrayRotateLeft, arrayRotateRight, generateCountedString, num, str } from "../../utils.js";
+import { arrayRotateLeft, arrayRotateRight, generateCountedString, num, ord, str } from "../../utils.js";
 import { INP, ADD, SUB, DUP, COND, GOTOU, OUTN, OUTA, ROL, SWAP, MUL, DIV, POP, GOTOS, PUSH, ROR, textToLength, regexComment } from './utils.js';
 
 export class LengthInterpreter extends BaseInterpreter {
@@ -49,7 +49,7 @@ export class LengthInterpreter extends BaseInterpreter {
                 const blocker = new Blocker();
                 this._callbackGetch(blocker);
                 let chr = await blocker.block(); // Wait for character
-                this.pushStack(num(chr.charCodeAt(0)));
+                this.pushStack(ord(chr));
                 this.debug(`Got Input: '${this._stack.top()}'`);
                 break;
             }
@@ -162,9 +162,9 @@ export class LengthInterpreter extends BaseInterpreter {
         return true;
     }
 
-    async interpret(code) {
+    async interpret() {
         try {
-            await super.interpret(code);
+            await super.interpret();
         } catch (e) {
             throw new Error(`Length: error on line ${this.line + 1} '${this._lines[this.line]}':\n ${e}`);
         }

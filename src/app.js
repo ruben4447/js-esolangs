@@ -269,6 +269,56 @@ export async function popupTextarea(title, text = undefined, btnText = 'Go') {
     });
 }
 
+export async function pushValueToStackPopup(allowString = true, allowNumber = true, allowBoolean = true) {
+    return new Promise((resolve, reject) => {
+        const popup = new Popup("Push Value to Stack");
+        let p, value;
+
+        if (allowString) {
+            p = document.createElement("p");
+            popup.insertAdjacentElement('beforeend', p);
+            p.insertAdjacentHTML('beforeend', '<b>String</b>: ');
+            let input = document.createElement("input");
+            input.type = "text";
+            input.addEventListener('change', () => value = input.value);
+            p.appendChild(input);
+        }
+        if (allowNumber) {
+            p = document.createElement("p");
+            popup.insertAdjacentElement('beforeend', p);
+            p.insertAdjacentHTML('beforeend', '<b>Number</b>: ');
+            let input = document.createElement("input");
+            input.type = "number";
+            input.addEventListener('change', () => value = +input.value);
+            p.appendChild(input);
+        }
+        if (allowBoolean) {
+            p = document.createElement("p");
+            popup.insertAdjacentElement('beforeend', p);
+            p.insertAdjacentHTML('beforeend', '<b>Boolean</b>: ');
+            let radioTrue = document.createElement("input"), n = Math.random();
+            radioTrue.type = "radio";
+            radioTrue.name = `radio-boolean-${n}`;
+            radioTrue.addEventListener('change', () => value = true);
+            p.appendChild(radioTrue);
+            p.insertAdjacentHTML('beforeend', ' True &nbsp; ');
+            let radioFalse = document.createElement("input");
+            radioFalse.type = "radio";
+            radioFalse.name = `radio-boolean-${n}`;
+            radioFalse.addEventListener('change', () => value = false);
+            p.appendChild(radioFalse);
+            p.insertAdjacentHTML('beforeend', ' False');
+        }
+
+        let btn = document.createElement("button");
+        btn.innerText = 'Push Value';
+        btn.addEventListener('click', () => popup.hide()); // .hide will trigger .onClose callback
+
+        popup.onClose(() => resolve(value));
+        popup.show();
+    });
+}
+
 export function editConsoleUI() {
     let div = document.createElement("div"), p = document.createElement("p");
     div.appendChild(p);

@@ -197,6 +197,9 @@ export function str(x) {
 }
 self.str = str;
 
+/** Return char code for a character. If empty, return -1 */
+export const ord = chr => chr.length === 0 ? -1 : num(str(chr).charCodeAt(0));
+
 /**
  * Read contents of file
  * @param {File} file <input type="file" /> file

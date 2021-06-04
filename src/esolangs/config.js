@@ -1,4 +1,4 @@
-import { popupTextarea } from './../app.js';
+import { popupTextarea, pushValueToStackPopup } from './../app.js';
 
 // == THESE BUTTON OBJECTS ARE USED A LOT, SO DEFINE AS CONSTANTS FOR REUSE AND
 const btnReset = {
@@ -10,7 +10,7 @@ const btnReset = {
 const btnInterpret = {
     interpret: {
         text: 'Interpret',
-        fn: (obj) => ({ code: obj.getCode() }),
+        fn: () => ({}),
     }
 };
 const btnStep = {
@@ -50,7 +50,7 @@ export const langOptions = {
         },
     },
     befunge: {
-        name: 'Begfunge',
+        name: 'Befunge',
         wiki: 'https://esolangs.org/wiki/Befunge',
         gui: { pointers: 'object', stack: 'stack' },
         opts: {
@@ -115,6 +115,27 @@ export const langOptions = {
             ...btnReset,
             ...btnStep,
             ...btnInterpret,
+        },
+    },
+    fish: {
+        name: 'Fish',
+        wiki: 'https://esolangs.org/wiki/Fish',
+        gui: { data: 'object', stack: 'stack', registerStack: 'stack' },
+        opts: {
+            debug: true,
+            wrapLimit: 50,
+            detailedErrors: true,
+            skipStrings: false,
+            selfModification: false,
+        },
+        buttons: {
+            ...btnReset,
+            pushStack: {
+                text: 'Push to Stack',
+                fn: async () => ({ value: await pushValueToStackPopup(false, true, false) }),
+            },
+            ...btnInterpret,
+            ...btnStep,
         },
     },
     length: {

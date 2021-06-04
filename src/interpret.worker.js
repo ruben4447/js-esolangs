@@ -8,6 +8,7 @@ import AirlineFoodInterpreter from "./esolangs/Airline-food/Interpreter.js";
 import FalseInterpreter from "./esolangs/FALSE/Interpreter.js";
 import { num } from "./utils.js";
 import UnderloadInterpreter from "./esolangs/Underload/Interpreter.js";
+import FishInterpreter from "./esolangs/Fish/Interpreter.js";
 
 var interpreter; // Code interpreter
 var activeBlocker; // Blocker object. May be resolve by cmd:'unblock'
@@ -102,6 +103,19 @@ function createInterpreter(lang, opts) {
                 flush(); // Flush the Workers output buffer
                 self.postMessage({ cmd: 'flush' }); // Flush the clients output buffer
             };
+            break;
+        }
+        case "fish": {
+            i = new FishInterpreter();
+            i.wrapLimit = parseInt(opts.wrapLimit);
+            i.detailedErrors = opts.detailedErrors === true;
+            i.skipStrings = opts.skipStrings === true;
+            i.selfModification = opts.selfModification === true;
+            i.customJcommand = opts.customJcommand === true;
+            if (opts.updateVisuals) {
+                i._callbackUpdateStack = (name, type, value, title) => self.postMessage({ cmd: 'updateStack', stack: name, type, value, title });
+                i._callbackUpdateObject = (name, action, key, value) => self.postMessage({ cmd: 'updateObject', action, name, key, value });
+            }
             break;
         }
         case "length": {
@@ -231,6 +245,14 @@ globalThis.onmessage = async (event) => {
                 }
                 case 'fromShorthand': {
                     codeFromShorthand(data.args.code);
+                    break;
+                }
+                case 'pushStack': {
+                    if (typeof interpreter.pushStack === 'function') {
+                        if (data.args.value !== undefined) interpreter.pushStack(data.args.value);
+                    } else {
+                        emitError(new Error(`Unable to push value to '${interpreter.LANG}' stack - procedure not found`));
+                    }
                     break;
                 }
                 default:

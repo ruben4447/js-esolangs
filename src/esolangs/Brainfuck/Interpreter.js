@@ -1,5 +1,5 @@
 import { Blocker } from '../../classes/Blocker.js';
-import { getMatchingBracket, num } from '../../utils.js';
+import { getMatchingBracket, num, ord } from '../../utils.js';
 import BaseInterpreter from '../BaseInterpreter.js';
 import { textToBrainfuck } from './utils.js';
 
@@ -89,7 +89,7 @@ export class BrainfuckInterpreter extends BaseInterpreter {
                 const blocker = new Blocker();
                 this._callbackGetch(blocker);
                 let chr = await blocker.block(); // Wait for character
-                this.setValue(num(chr.charCodeAt(0)));
+                this.setValue(ord(chr));
                 break;
             }
             case '[':
