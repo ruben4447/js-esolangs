@@ -1,10 +1,10 @@
-import { main, elStatus, createInterpreterWorker, killInterpreterWorker, selectEsolang, interpreterWorker, editConsoleUI, esolang, promptForInputPopup, setCode } from './app.js';
-import { createFieldset, randomInt, readFileAsText, sleep } from './utils.js';
+import { main, elStatus, createInterpreterWorker, killInterpreterWorker, selectEsolang, interpreterWorker, esolang, promptForInputPopup, generateSettingsPopup } from './app.js';
+import { createFieldset, readFileAsText, sleep } from './utils.js';
 import { langOptions } from './esolangs/config.js';
 import UserControl from "./classes/UserControl.js";
 import IOConsole from "./classes/Console.js";
 
-export var userControl, ioconsole, gDelay = 0;
+export var userControl, ioconsole;
 
 function _main() {
     // == SETUP HTML ==
@@ -33,23 +33,15 @@ function _main() {
         createInterpreterWorker();
     });
     p.appendChild(btnTerminate);
-    let btnSetDelay = document.createElement('button');
-    btnSetDelay.innerText = `Delay`;
-    btnSetDelay.title = "Set delay between each step when interpreting";
-    btnSetDelay.addEventListener('click', async () => {
-        let newDelay = await promptForInputPopup('Execution Delay', 'Set delay between each step when interpreting (milliseconds)', false, true, false, gDelay);
-        interpreterWorker.postMessage({ cmd: 'setDelay', delay: newDelay });
-        gDelay = newDelay;
-    });
-    p.appendChild(btnSetDelay);
     let btnClearScreen = document.createElement('button');
     btnClearScreen.innerText = `Clear Console`;
     btnClearScreen.addEventListener('click', () => ioconsole.clear());
     p.appendChild(btnClearScreen);
-    let btnEditConsole = document.createElement('button');
-    btnEditConsole.innerText = `Edit Console`;
-    btnEditConsole.addEventListener('click', () => editConsoleUI());
-    p.appendChild(btnEditConsole);
+    let btnSettings = document.createElement('button');
+    btnSettings.innerHTML = `&#9881; Settings`;
+    btnSettings.title = "Set delay between each step when interpreting";
+    btnSettings.addEventListener('click', generateSettingsPopup);
+    p.appendChild(btnSettings);
     let btnWiki = document.createElement('button');
     btnWiki.innerHTML = `&#128279; Wiki`;
     btnWiki.addEventListener('click', () => {
@@ -110,4 +102,6 @@ function _main() {
 
 window.addEventListener('load', async () => {
     await _main();
+
+    selectEsolang("befunge", true, false);
 });

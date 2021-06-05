@@ -8,6 +8,8 @@ import { userControl, ioconsole } from './main.js';
 export const main = document.createElement('div');
 // == CURRENT ESOLANG SELECTED ==
 export var esolang = null;
+// == CURRENT EXECUTION DELAY ==
+export var execDelay = 0;
 // == Components -> { [name: string]: object } ==
 var components = {};
 globalThis.components = components;
@@ -15,6 +17,8 @@ globalThis.components = components;
 export var interpreterWorker;
 // == DOM ELEMENT FOR STATUS ==
 export const elStatus = document.createElement("code");
+// == UPDATE CODE GRID? ==
+var codeGridEnabled = true;
 
 export function createInterpreterWorker() {
     if (interpreterWorker === undefined) {
@@ -142,18 +146,20 @@ export function createInterpreterWorker() {
                         break;
                     case 'updateCodeGrid':
                         if (components.grid == undefined) throw new Error(`Recieved command "${data.cmd}", but no grid to update`);
-                        if (data.code !== undefined) { // Code
-                            if (data.format === 'array') {
-                                components.grid.setCodeArray(data.code);
-                            } else {
-                                components.grid.setCode(data.code, false);
+                        if (codeGridEnabled) { // Do not update if disabled.
+                            if (data.code !== undefined) { // Code
+                                if (data.format === 'array') {
+                                    components.grid.setCodeArray(data.code);
+                                } else {
+                                    components.grid.setCode(data.code, false);
+                                }
                             }
-                        }
-                        if (data.positions !== undefined) { // Positions to highlight
-                            data.positions.forEach(p => {
-                                components.grid.highlight(...p);
-                            });
-                            components.grid.updateHighlighted();
+                            if (data.positions !== undefined) { // Positions to highlight
+                                data.positions.forEach(p => {
+                                    components.grid.highlight(...p);
+                                });
+                                components.grid.updateHighlighted();
+                            }
                         }
                         break;
                     default:
@@ -262,7 +268,7 @@ export function prepareEsolangGUI(lang, updateVisuals) {
 
 export function setCode(code) {
     userControl.setCode(code, false); // DO NOT send another request to the worker - infinite loop!
-    if (components.grid) components.grid.setCode(code, true);
+    if (components.grid && codeGridEnabled) components.grid.setCode(code, true);
 }
 
 /** Create popup with textarea, and wait for user to press buttons before resolving Promise. */
@@ -351,27 +357,68 @@ export async function promptForInputPopup(title, text = undefined, allowString =
     });
 }
 
-export function editConsoleUI() {
-    let div = document.createElement("div"), p = document.createElement("p");
-    div.appendChild(p);
-    p.innerText = "Width: ";
-    let inputWidth = document.createElement("input");
-    inputWidth.type = "number";
-    inputWidth.value = ioconsole._.clientWidth;
-    inputWidth.addEventListener('change', () => {
-        ioconsole._.style.width = inputWidth.value + "px";
-    });
-    p.appendChild(inputWidth);
+export function generateSettingsPopup() {
+    const div = document.createElement("div");
+    div.classList.add('settings');
+    const table = document.createElement("table"), tbody = document.createElement("tbody");
+    div.appendChild(table);
+    table.appendChild(tbody);
+    let tr, td;
 
-    p = document.createElement("p");
-    div.appendChild(p);
-    p.innerText = "Height: ";
-    let inputHeight = document.createElement("input");
-    inputHeight.type = "number";
-    inputHeight.value = ioconsole._.clientHeight;
-    inputHeight.addEventListener('change', () => {
-        ioconsole._.style.height = inputHeight.value + "px";
+    table.insertAdjacentHTML('afterbegin', `<thead><tr><th>Esolang</th><td>${esolang}</td></tr></thead>`);
+
+    // CONSOLE DIMENSIONS
+    tr = document.createElement("tr");
+    tbody.appendChild(tr);
+    tr.insertAdjacentHTML('beforeend', '<thead>Console Dimensions</thead>');
+    td = document.createElement("td");
+    tr.appendChild(td);
+    let inputConsoleWidth = document.createElement("input");
+    inputConsoleWidth.type = "number";
+    inputConsoleWidth.value = ioconsole._.clientWidth;
+    inputConsoleWidth.addEventListener('change', () => ioconsole._.style.width = inputConsoleWidth.value + "px");
+    td.appendChild(inputConsoleWidth);
+    td.insertAdjacentHTML('beforeend', ' &nbsp; &times; &nbsp; ');
+    let inputConsoleHeight = document.createElement("input");
+    inputConsoleHeight.type = "number";
+    inputConsoleHeight.value = ioconsole._.clientHeight;
+    inputConsoleHeight.addEventListener('change', () => ioconsole._.style.height = inputConsoleHeight.value + "px");
+    td.appendChild(inputConsoleHeight);
+
+    // EXEC DELAY
+    tr = document.createElement("tr");
+    tbody.appendChild(tr);
+    tr.insertAdjacentHTML('beforeend', '<th><abbr title=\'Delay between steps when interpreting code\'>Delay</abbr></th>');
+    td = document.createElement("td");
+    tr.appendChild(td);
+    let inputDelay = document.createElement("input");
+    inputDelay.type = "number";
+    inputDelay.min = "0";
+    inputDelay.max = "1000000";
+    inputDelay.value = execDelay;
+    inputDelay.addEventListener('change', () => {
+        execDelay = +inputDelay.value;
+        interpreterWorker.postMessage({ cmd: 'setDelay', delay: execDelay });
     });
-    p.appendChild(inputHeight);
-    new Popup("Edit Console").setContent(div).show();
+    td.appendChild(inputDelay);
+    td.insertAdjacentHTML('beforeend', ' ms');
+
+    // ENABLE CODEGRID?
+    tr = document.createElement("tr");
+    tbody.appendChild(tr);
+    tr.insertAdjacentHTML('beforeend', '<th><abbr title=\'Update code grid? (This may cause extra latency and, for self-modifying languages such as underscore, may crash the webpage)\'>Code Grid?</abbr></th>');
+    td = document.createElement("td");
+    tr.appendChild(td);
+    let inputCodeGrid = document.createElement("input");
+    inputCodeGrid.type = 'checkbox';
+    inputCodeGrid.checked = codeGridEnabled;
+    inputCodeGrid.addEventListener('change', () => {
+        codeGridEnabled = inputCodeGrid.checked;
+        if (codeGridEnabled && components.grid) {
+            new Popup("Information").insertAdjacentText('beforeend', 'Please press the \'Restart\' button to enable changes').show();
+        }
+    });
+    td.appendChild(inputCodeGrid);
+
+    new Popup("Settings").setContent(div).show();
 }

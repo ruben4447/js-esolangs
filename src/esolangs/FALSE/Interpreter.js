@@ -499,6 +499,7 @@ export class FalseInterpreter extends BaseInterpreter {
       }
     }
     if (this.ptr === ptr && char !== '#') throw new Error(`POINTER ERROR: pointer has not changed after execution cycle - infinite loop detected`);
+
     return true;
   }
 
@@ -508,7 +509,6 @@ export class FalseInterpreter extends BaseInterpreter {
     } catch (e) {
       console.error(e);
       const traces = this.generateTraceback();
-      const { line, col } = linearPosToLineCol(atop(this._call), atop(this._ptrs));
       throw new Error(`Fatal error in function ${this._call.length} at '${atop(this._call)[atop(this._ptrs)]}' : \n${e}\n\n ===== CALL STACK =====\n${traces.join('\n')}`);
     }
   }
@@ -519,7 +519,6 @@ const TYPE = createEnum({
   Boolean: 1,
   String: 2,
   Function: 4,
-  VarRef: 8,
 });
 
 export default FalseInterpreter;

@@ -6,9 +6,9 @@ import SlashesInterpreter from "./esolangs/Slashes/Interpreter.js";
 import BeatnikInterpreter from "./esolangs/Beatnik/Interpreter.js";
 import AirlineFoodInterpreter from "./esolangs/Airline-food/Interpreter.js";
 import FalseInterpreter from "./esolangs/FALSE/Interpreter.js";
-import { num } from "./utils.js";
 import UnderloadInterpreter from "./esolangs/Underload/Interpreter.js";
 import FishInterpreter from "./esolangs/Fish/Interpreter.js";
+import { num } from "./utils.js";
 
 var interpreter; // Code interpreter
 var activeBlocker; // Blocker object. May be resolve by cmd:'unblock'
