@@ -20,7 +20,6 @@ export class CodeGrid {
     this.font = "15px Consolas";
     this.bgh = "#fad980";//"rgba(255,241,210,.5)";
     this.fgh = "black";
-    this.fonth = "bold 15px Consolas";
   }
 
   /** Set a code string */
@@ -94,7 +93,6 @@ export class CodeGrid {
 
 
     // Add new highlights
-    ctx.font = this.fonth;
     for (let highlight of this._highlightedPositions) {
       try {
         let x = highlight.col * this.charDim, y = highlight.line * this.charDim, char = this._lines[highlight.line][highlight.col];

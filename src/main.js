@@ -1,4 +1,4 @@
-import { main, elStatus, createInterpreterWorker, killInterpreterWorker, selectEsolang, interpreterWorker, esolang, promptForInputPopup, generateSettingsPopup } from './app.js';
+import { main, elStatus, createInterpreterWorker, killInterpreterWorker, selectEsolang, interpreterWorker, esolang, promptForInputPopup, generateSettingsPopup, setCode } from './app.js';
 import { createFieldset, readFileAsText, sleep } from './utils.js';
 import { langOptions } from './esolangs/config.js';
 import UserControl from "./classes/UserControl.js";
@@ -103,5 +103,14 @@ function _main() {
 window.addEventListener('load', async () => {
     await _main();
 
-    selectEsolang("befunge", true, false);
+    selectEsolang("asciiDots", true, false);
+    setCode(`  &
+  |
+  |
+  |
+•-*---&
+  |
+  |
+  |
+  &`, true);
 });

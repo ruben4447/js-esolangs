@@ -43,6 +43,21 @@ export const langOptions = {
             ...btnStep,
         },
     },
+    asciiDots: {
+        name: 'ASCII Dots',
+        dir: 'ASCII-Dots',
+        wiki: 'https://esolangs.org/wiki/AsciiDots',
+        gui: { dotStack: 'stack', grid: 'codeGrid' },
+        opts: {
+            debug: true,
+            implicitDeath: true,
+        },
+        buttons: {
+            ...btnReset,
+            ...btnInterpret,
+            ...btnStep,
+        },
+    },
     beatnik: {
         name: 'Beatnik',
         dir: 'Beatnik',

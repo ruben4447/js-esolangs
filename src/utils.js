@@ -188,6 +188,9 @@ export function arrayRotateRight(array) {
 /** Get top value of array */
 export const atop = arr => arr[arr.length - 1];
 
+/** Add arrays */
+export const arrayAdd = (a, b) => ([a[0] + b[0], a[1] + b[1]]);
+
 /** Convert object to number */
 export function num(x) {
     if (typeof x === 'number') return x;

@@ -9,13 +9,14 @@ import FalseInterpreter from "./esolangs/FALSE/Interpreter.js";
 import UnderloadInterpreter from "./esolangs/Underload/Interpreter.js";
 import FishInterpreter from "./esolangs/Fish/Interpreter.js";
 import { num } from "./utils.js";
+import { AsciiDotsInterpreter } from "./esolangs/ASCII-Dots/Interpreter.js";
 
 var interpreter; // Code interpreter
 var activeBlocker; // Blocker object. May be resolve by cmd:'unblock'
 var interpreting = false;
 const statusStack = [];
 var codeCache; // Store code from 'loadCode' event
-var gDelay = 0; // Delay for interpreting
+var gDelay = 300; // Delay for interpreting
 
 function pushStatus(status) {
     statusStack.push(status);
@@ -58,6 +59,15 @@ function createInterpreter(lang, opts) {
             if (opts.updateVisuals) {
                 i._callbackUpdateObject = (name, action, key, value) => self.postMessage({ cmd: 'updateObject', action, name, key, value });
                 i._callbackUpdateStack = (type, value) => self.postMessage({ cmd: 'updateStack', type, value });
+            }
+            break;
+        }
+        case "asciiDots": {
+            i = new AsciiDotsInterpreter();
+            i.implicitDeath = opts.implicitDeath === true;
+            if (opts.updateVisuals) {
+                i._callbackUpdateDotStack = () => self.postMessage({ cmd: 'updateStack', stack: 'dot', type: 'update', value: i._dots.map(dot => dot.toDisplayString()) });
+                i._callbackHighlightDots = () => self.postMessage({ cmd: 'updateCodeGrid', code: undefined, positions: i._dots.map(dot => dot.pos) });
             }
             break;
         }

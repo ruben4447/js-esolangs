@@ -266,8 +266,8 @@ export function prepareEsolangGUI(lang, updateVisuals) {
     }
 }
 
-export function setCode(code) {
-    userControl.setCode(code, false); // DO NOT send another request to the worker - infinite loop!
+export function setCode(code, triggerCb = false) {
+    userControl.setCode(code, triggerCb); // if triggerCb=false: DO NOT send another request to the worker - infinite loop!
     if (components.grid && codeGridEnabled) components.grid.setCode(code, true);
 }
 
