@@ -104,13 +104,12 @@ window.addEventListener('load', async () => {
     await _main();
 
     selectEsolang("asciiDots", true, false);
-    setCode(`  &
+    setCode(`  . \`\` Start
   |
+  # \`\` Get ready to set the value
+  ? \`\` Prompt the user
   |
-  |
-•-*---&
-  |
-  |
-  |
-  &`, true);
+  $
+  # \`\` Print that value to the console
+    \`\` Since the only dot goes off the end of the path, it dies. Since no dots are left, the program ends`, true);
 });

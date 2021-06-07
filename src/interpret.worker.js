@@ -64,7 +64,6 @@ function createInterpreter(lang, opts) {
         }
         case "asciiDots": {
             i = new AsciiDotsInterpreter();
-            i.implicitDeath = opts.implicitDeath === true;
             if (opts.updateVisuals) {
                 i._callbackUpdateDotStack = () => self.postMessage({ cmd: 'updateStack', stack: 'dot', type: 'update', value: i._dots.map(dot => dot.toDisplayString()) });
                 i._callbackHighlightDots = () => self.postMessage({ cmd: 'updateCodeGrid', code: undefined, positions: i._dots.map(dot => dot.pos) });

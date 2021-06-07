@@ -50,7 +50,6 @@ export const langOptions = {
         gui: { dotStack: 'stack', grid: 'codeGrid' },
         opts: {
             debug: true,
-            implicitDeath: true,
         },
         buttons: {
             ...btnReset,
