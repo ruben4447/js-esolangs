@@ -88,7 +88,7 @@ export class UnderloadInterpreter extends BaseInterpreter {
         this._callbackUpdateCode();
         break;
       case 'S':
-        this._callbackOutput(this.popStack());
+        this.print(this.popStack());
         break;
       default:
         throw new Error(`Invalid syntax`);

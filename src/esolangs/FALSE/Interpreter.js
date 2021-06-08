@@ -1,5 +1,4 @@
 import BaseInterpreter from "../BaseInterpreter.js";
-import Blocker from "../../classes/Blocker.js";
 import { linearPosToLineCol, createEnum, underlineStringPortion, regexNumber, atop, regexWhitespace, scanNumber, num, scanString, getMatchingBracket, highlightStringPortion, escapeHtml, regexLetter, ord } from "../../utils.js";
 import { scanComment } from "./utils.js";
 
@@ -217,7 +216,7 @@ export class FalseInterpreter extends BaseInterpreter {
       if (this._call[ti][this.ptr] !== '"') throw new Error(`'"' expected`);
       else this.ptr++; // Increment past final '"'
 
-      this._callbackOutput(obj.str);
+      this.print(obj.str);
       this.debug(`STRING LITERAL: (${obj.length}) "${obj.str}"`);
     }
 
@@ -387,11 +386,9 @@ export class FalseInterpreter extends BaseInterpreter {
 
         // == INPUT CHAR (getch) ==
         case '^': {
-          const blocker = new Blocker();
-          this._callbackGetch(blocker);
-          const char = await blocker.block(), charCode = ord(char);
+          const charCode = await this.getch(true);
           this.pushStack(charCode, TYPE.Number);
-          this.debug(`INPUT: getch'd "${char}" code ${charCode}`);
+          this.debug(`GETCH: char code ${charCode}`);
           this.ptr++;
           break;
         }
@@ -399,7 +396,7 @@ export class FalseInterpreter extends BaseInterpreter {
         // == OUTPUT CHAR ==
         case ',': {
           const a = this.popStack(TYPE.Number), char = str(String.fromCharCode(a.value));
-          this._callbackOutput(char);
+          this.print(char);
           this.debug(`OUTPUT: output ASCII ${a.value} -> "${char}"`);
           this.ptr++;
           break;
@@ -408,7 +405,7 @@ export class FalseInterpreter extends BaseInterpreter {
         // == OUTPUT NUM ==
         case '.': {
           const a = this.popStack(TYPE.Number);
-          this._callbackOutput(a.value);
+          this.print(a.value);
           this.debug(`OUTPUT: output number ${a.value}`);
           this.ptr++;
           break;

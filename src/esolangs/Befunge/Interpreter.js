@@ -1,7 +1,6 @@
 import BaseInterpreter from '../BaseInterpreter.js';
 import { Stack } from '../../classes/Stack.js';
 import { num, padLines, randomChoice, regexNumber, regexWhitespace, str, strReplaceAt } from '../../utils.js';
-import Blocker from '../../classes/Blocker.js';
 
 export class BefungeInterpreter extends BaseInterpreter {
     constructor() {
@@ -217,25 +216,21 @@ export class BefungeInterpreter extends BaseInterpreter {
                 this.popStack();
             } else if (c === '.') {
                 // Print as Number
-                this._callbackOutput(str(num(this.popStack())));
+                this.print(num(this.popStack()));
             } else if (c === ',') {
                 // Print as ASCII character
-                this._callbackOutput(str(String.fromCharCode(num(this.popStack()))));
+                this.print(String.fromCharCode(num(this.popStack())));
             } else if (c === '#') {
                 this.x += this.mx;
                 this.y += this.my;
             } else if (c === '&') {
                 // Get integer from user
-                const blocker = new Blocker();
-                this._callbackInput(blocker); // Request input (callback will call blocker.unblock(<value>))
-                const input = await blocker.block(); // Wait for input
-                this.pushStack(num(input));
+                let inp = await this.input();
+                this.pushStack(num(inp));
             } else if (c === '~') {
                 // Get character from user, push ASCII code
-                const blocker = new Blocker();
-                this._callbackGetch(blocker); // Request getch (callback will call blocker.unblock(<value>))
-                const char = await blocker.block(); // Wait for input
-                this.pushStack(chr(char));
+                let code = await this.getch(true);
+                this.pushStack(code);
             } else if (this.selfModification && c === 'g') {
                 // throw new Error(`IMPLEMENTATION ERROR: operator 'g' is not implemented`);
                 let y = num(this.popStack()), x = num(this.popStack()), n;

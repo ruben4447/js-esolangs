@@ -1,6 +1,5 @@
 import { Stack } from '../../classes/Stack.js';
-import { scanString, regexLetter, scanNumber, regexNumber, arrayMoveItem, getMatchingBracket, bracketMap, num, str } from '../../utils.js';
-import Blocker from '../../classes/Blocker.js';
+import { scanString, arrayMoveItem, getMatchingBracket, num, str } from '../../utils.js';
 import BaseInterpreter from '../BaseInterpreter.js';
 
 export class ElementInterpreter extends BaseInterpreter {
@@ -100,17 +99,13 @@ export class ElementInterpreter extends BaseInterpreter {
         } else {
             switch (char) {
                 case '_': {
-                    const blocker = new Blocker();
-                    this._callbackInput(blocker); // Request input (callback will call blocker.unblock(<value>))
-                    let input = await blocker.block(); // Wait for input
+                    let input = await this.input();
                     this.pushMain(input);
                     break;
                 }
-                case '`': {
-                    let value = this.popMain();
-                    this._callbackOutput(value.toString()); // Output value
+                case '`':
+                    this.print(this.popMain()); // Output value
                     break;
-                }
                 case ';': {
                     // this.checkStackSize(this._main, 1, 'main');
                     const symbol = str(this.popMain()), value = str(this.popMain());

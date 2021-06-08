@@ -1,4 +1,4 @@
-import { main, elStatus, createInterpreterWorker, killInterpreterWorker, selectEsolang, interpreterWorker, esolang, promptForInputPopup, generateSettingsPopup, setCode } from './app.js';
+import { main, elStatus, createInterpreterWorker, killInterpreterWorker, selectEsolang, interpreterWorker, esolang, promptForInputPopup, generateSettingsPopup, setCode, setDelay } from './app.js';
 import { createFieldset, readFileAsText, sleep } from './utils.js';
 import { langOptions } from './esolangs/config.js';
 import UserControl from "./classes/UserControl.js";
@@ -103,13 +103,30 @@ function _main() {
 window.addEventListener('load', async () => {
     await _main();
 
-    selectEsolang("asciiDots", true, false);
-    setCode(`  . \`\` Start
-  |
-  # \`\` Get ready to set the value
-  ? \`\` Prompt the user
-  |
-  $
-  # \`\` Print that value to the console
-    \`\` Since the only dot goes off the end of the path, it dies. Since no dots are left, the program ends`, true);
+    selectEsolang("underload", true, false);
+    setDelay(20);
+    // setCode(`,.`, true);
+
+//     selectEsolang("asciiDots", true, false);
+//     setDelay(120);
+//     setCode(`  . \`\` Start
+//   |
+//   # \`\` Get ready to set the value
+//   ? \`\` Prompt the user
+//   |
+//   $
+//   # \`\` Print that value to the console
+//     \`\` Since the only dot goes off the end of the path, it dies. Since no dots are left, the program ends`, true);
+//     setCode(`     /1#-.
+//      |
+//    /-+-$#\\
+//    | |   |
+//   [+]<1#-*
+//    |     |
+//    \\--<--/
+//       |
+//       0
+//       #
+//       |
+//       .`, true);
 });

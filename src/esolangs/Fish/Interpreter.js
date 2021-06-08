@@ -1,7 +1,6 @@
 import BaseInterpreter from "../BaseInterpreter.js";
 import { Stack } from "../../classes/Stack.js";
-import { num, ord, padLines, regexNumber, regexWhitespace } from "../../utils.js";
-import Blocker from "../../classes/Blocker.js";
+import { num, ord, padLines } from "../../utils.js";
 
 export class FishInterpreter extends BaseInterpreter {
   constructor() {
@@ -363,16 +362,14 @@ export class FishInterpreter extends BaseInterpreter {
         else if (char === 'o' || char === 'n') {
           let x = num(this.popStack()),
             o = str(char === 'n' ? x : String.fromCharCode(x));
-          this._callbackOutput(o);
+          this.print(o);
           this.debug(`OUTPUT ${char}: ${x} , '${o}'`);
         }
 
         // == INPUT: GETCH ==
         else if (char === 'i') {
-          const blocker = new Blocker();
-          this._callbackGetch(blocker);
-          const char = await blocker.block(), charCode = ord(char);
-          this.debug(`INPUT: '${char}' = ${charCode}`);
+          let charCode = await this.getch(true);
+          this.debug(`GETCH: char code ${charCode}`);
           this.pushStack(charCode);
         }
 

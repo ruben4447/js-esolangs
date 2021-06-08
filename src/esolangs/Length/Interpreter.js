@@ -1,7 +1,6 @@
 import BaseInterpreter from "../BaseInterpreter.js";
 import { Stack } from "../../classes/Stack.js";
-import { Blocker } from "../../classes/Blocker.js";
-import { arrayRotateLeft, arrayRotateRight, generateCountedString, num, ord, str } from "../../utils.js";
+import { arrayRotateLeft, arrayRotateRight, generateCountedString, num, str } from "../../utils.js";
 import { INP, ADD, SUB, DUP, COND, GOTOU, OUTN, OUTA, ROL, SWAP, MUL, DIV, POP, GOTOS, PUSH, ROR, textToLength, regexComment } from './utils.js';
 
 export class LengthInterpreter extends BaseInterpreter {
@@ -46,10 +45,8 @@ export class LengthInterpreter extends BaseInterpreter {
         const length = this._lines[this.line].length;
         switch (length) {
             case INP: {
-                const blocker = new Blocker();
-                this._callbackGetch(blocker);
-                let chr = await blocker.block(); // Wait for character
-                this.pushStack(ord(chr));
+                let chrCode = await this.getch(true);
+                this.pushStack(chrCode);
                 this.debug(`Got Input: '${this._stack.top()}'`);
                 break;
             }
@@ -97,12 +94,12 @@ export class LengthInterpreter extends BaseInterpreter {
             case OUTN:
                 if (this._stack.size() < 1) throw new Error(`OUTN: Stack underflow`);
                 this.debug(`Print as number: '${this._stack.top()}'`);
-                this._callbackOutput(str(num(this.popStack()))); // Output top value as a number
+                this.print(num(this.popStack())); // Output top value as a number
                 break;
             case OUTA:
                 if (this._stack.size() < 1) throw new Error(`OUTA: Stack underflow`);
                 this.debug(`Print as ASCII: '${String.fromCharCode(this._stack.top())}'`);
-                this._callbackOutput(str(String.fromCharCode(+this.popStack()))); // Output top value as an ASCII character
+                this.print(str(String.fromCharCode(+this.popStack()))); // Output top value as an ASCII character
                 break;
             case ROL:
                 if (this._stack.size() < 1) break;

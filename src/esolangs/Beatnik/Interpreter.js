@@ -1,8 +1,7 @@
 import BaseInterpreter from "../BaseInterpreter.js";
 import { scrabble } from "./utils.js";
 import { Stack } from "../../classes/Stack.js";
-import Blocker from "../../classes/Blocker.js";
-import { num, ord, str, regexNewline } from "../../utils.js";
+import { num, str, regexNewline } from "../../utils.js";
 
 export class BeatnikInterpreter extends BaseInterpreter {
     constructor() {
@@ -83,17 +82,15 @@ export class BeatnikInterpreter extends BaseInterpreter {
             }
             case 8: {
                 // GETCH
-                const blocker = new Blocker();
-                this._callbackGetch(blocker);
-                let chr = await blocker.block(); // Wait for character
-                this.pushStack(ord(chr));
+                let chr = await this.getch(true);
+                this.pushStack(chr);
                 break;
             }
             case 9: {
                 // Print
                 const charCode = num(this.popStack()), char = str(String.fromCharCode(charCode));
                 this.debug(`PRINT: ${charCode} ('${char}')`);
-                this._callbackOutput(char);
+                this.print(char);
                 break;
             }
             case 10: {

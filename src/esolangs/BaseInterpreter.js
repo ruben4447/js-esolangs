@@ -1,4 +1,5 @@
-import { sleep } from "../utils.js";
+import { ord, sleep, str } from "../utils.js";
+import Blocker from "../classes/Blocker.js";
 
 /**
  * Base class for a language interpreter
@@ -28,6 +29,40 @@ export class BaseInterpreter {
     }
     debugWarn(...args) {
         if (this._debug) console.warn(...args);
+    }
+
+    /**
+     * Get single input from user
+     * @param {boolean} asciiCode Return GETCH'd character as its ASCII code?
+     * @returns {Promise<string | number>}
+    */
+    async getch(asciiCode = false) {
+        if (typeof this._callbackGetch !== 'function') return asciiCode ? -1 : ''; // Return EOF flag
+        const blocker = new Blocker();
+        this._callbackGetch(blocker);
+        let input = await blocker.block(); // Block code execution until input is recieved
+        if (asciiCode) {
+            return input.length === 0 ? -1 : ord(input);
+        } else {
+            return input;
+        }
+    }
+
+    /** Get input from the user
+     * @returns {Promise<string>}
+    */
+    async input() {
+        if (typeof this._callbackInput !== 'function') return '';
+        const blocker = new Blocker();
+        this._callbackInput(blocker);
+        let input = await blocker.block();
+        return input;
+    }
+
+    /** Print given text to screen */
+    print(msg) {
+        if (typeof this._callbackOutput !== 'function') throw new Error(`Call to 'print' without registered callback handler`);
+        this._callbackOutput(str(msg));
     }
 
     /** MUST BE OVERRIDEN */

@@ -1,7 +1,6 @@
 import BaseInterpreter from "../BaseInterpreter.js";
 import { Stack } from "../../classes/Stack.js";
-import Blocker from "../../classes/Blocker.js";
-import { extractUntil, underlineStringPortion, num, regexWhitespace, str } from "../../utils.js";
+import { extractUntil, underlineStringPortion, num, regexWhitespace } from "../../utils.js";
 import { constructBlockMap } from "./utils.js";
 
 export class AirlineFoodInterpreter extends BaseInterpreter {
@@ -165,9 +164,7 @@ export class AirlineFoodInterpreter extends BaseInterpreter {
         else if (this.matchText("Right?")) {
             this.checkSP();
 
-            const blocker = new Blocker();
-            this._callbackInput(blocker);
-            let input = await blocker.block(); // Block code execution until input is recieved
+            let input = await this.input();
             this.setStack(this.sp, num(input)); // Set value
 
             this.ip += this._matchedText.length; // Increment IP
@@ -179,7 +176,7 @@ export class AirlineFoodInterpreter extends BaseInterpreter {
 
             let number = num(this._stack.get(this.sp)),
                 string = (!this.outputNumbers && number >= 0 && number <= 0xFFFF) ? String.fromCharCode(number) : number;
-            this._callbackOutput(str(string));
+            this.print(string);
             this.ip += this._matchedText.length; // Increment IP
 
             this.debug(`Output value ${number} ('${string}')`);

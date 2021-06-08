@@ -25,7 +25,7 @@ Decrements data in cell at pointer
 Outputs the character in the cell at the pointer as an ASCII character. (e.g. 65 -> `A`)
 
 # `,`
-Requests **one** character of input (like C++ `getch()`)
+Requests **one** character of input (like C++ `getch()`) and sets cell to ASCII code of character
 
 # `[`
 Jump past the matching `]` if the cell at the pointer `== 0`

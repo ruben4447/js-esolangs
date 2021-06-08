@@ -1,4 +1,4 @@
-import { createObjectFromType } from "./utils.js";
+import { createObjectFromType, num } from "./utils.js";
 import Popup from './classes/Popup.js';
 import { createFieldset } from './utils.js';
 import { langOptions } from './esolangs/config.js';
@@ -271,6 +271,11 @@ export function setCode(code, triggerCb = false) {
     if (components.grid && codeGridEnabled) components.grid.setCode(code, true);
 }
 
+export function setDelay(d) {
+    execDelay = +num(d);
+    interpreterWorker.postMessage({ cmd: 'setDelay', delay: execDelay });
+}
+
 /** Create popup with textarea, and wait for user to press buttons before resolving Promise. */
 export async function popupTextarea(title, text = undefined, btnText = 'Go') {
     return new Promise((resolve, reject) => {
@@ -396,10 +401,7 @@ export function generateSettingsPopup() {
     inputDelay.min = "0";
     inputDelay.max = "1000000";
     inputDelay.value = execDelay;
-    inputDelay.addEventListener('change', () => {
-        execDelay = +inputDelay.value;
-        interpreterWorker.postMessage({ cmd: 'setDelay', delay: execDelay });
-    });
+    inputDelay.addEventListener('change', () => setDelay(inputDelay.value));
     td.appendChild(inputDelay);
     td.insertAdjacentHTML('beforeend', ' ms');
 

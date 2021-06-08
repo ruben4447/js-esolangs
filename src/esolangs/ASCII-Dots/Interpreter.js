@@ -3,7 +3,6 @@ import { padLines, ord, num } from "../../utils.js";
 import Dot from "./Dot.js";
 import { Char, CurlyBracketChar, DotChar, SquareBracketChar, TildeChar, WarpChar } from "./chars.js";
 import { isInversionChar } from "./utils.js";
-import Blocker from "../../classes/Blocker.js";
 
 var currentWarpId = 0;
 export class AsciiDotsInterpreter extends BaseInterpreter {
@@ -134,19 +133,8 @@ export class AsciiDotsInterpreter extends BaseInterpreter {
   }
 
   async getch(ascii = false) {
-    console.log("GETCH ASCII=" + ascii);
-    const blocker = new Blocker();
-    this._callbackGetch(blocker);
-    let inp = await blocker.block();
-    if (ascii) {
-      return inp.length === 0 ? -1 : ord(inp); // value=char code
-    } else {
-      return num(inp); // value=number
-    }
-  }
-
-  print(msg) {
-    this._callbackOutput(msg);
+    let inp = await super.getch(ascii);
+    return num(inp);
   }
 
   async step() {

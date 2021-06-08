@@ -16,7 +16,7 @@ var activeBlocker; // Blocker object. May be resolve by cmd:'unblock'
 var interpreting = false;
 const statusStack = [];
 var codeCache; // Store code from 'loadCode' event
-var gDelay = 300; // Delay for interpreting
+var gDelay = 0; // Delay for interpreting
 
 function pushStatus(status) {
     statusStack.push(status);
@@ -194,12 +194,6 @@ function createInterpreter(lang, opts) {
     i._execDelay = gDelay;
     postMessage("Created interpreter for " + i.LANG);
 
-    // Load code if there is any in the cache
-    if (codeCache !== undefined) {
-        loadCode(codeCache);
-        codeCache = undefined;
-    }
-
     return i;
 }
 
@@ -209,6 +203,13 @@ globalThis.onmessage = async (event) => {
         if (data.cmd === 'setEsolang') {
             try {
                 interpreter = createInterpreter(data.lang, data.opts);
+
+                // Load code if there is any in the cache
+                if (codeCache !== undefined) {
+                    loadCode(codeCache);
+                    codeCache = undefined;
+                }
+
                 const payload = { cmd: 'setEsolang', lang: data.lang, updateVisuals: data.opts.updateVisuals };
                 if (data.opts.updateVisuals && interpreter instanceof BrainfuckInterpreter) payload.numArray = interpreter._data;
                 self.postMessage(payload); // Render stuff on main thread

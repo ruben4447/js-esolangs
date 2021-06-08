@@ -37,7 +37,7 @@ export class SlashesInterpreter extends BaseInterpreter {
                     else { toPrint += this._code[0]; shift(); }
                 }
             }
-            if (toPrint.length !== 0) this._callbackOutput(toPrint); // Print stuff (do it in one go to avoid latency on main thread)
+            if (toPrint.length !== 0) this.print(toPrint); // Print stuff (do it in one go to avoid latency on main thread)
             this.debug(`Print '${toPrint}'; pattern '${args[0]}'; replacement '${args[1]}'; string '${this._code}'`);
             this.pattern = args[0];
             this.replacement = args[1];
